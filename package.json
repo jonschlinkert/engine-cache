@@ -37,6 +37,7 @@
     "test": "mocha -R spec"
   },
   "devDependencies": {
+    "engine-lodash": "^0.1.0",
     "engines": "^0.3.1",
     "handlebars": "^2.0.0-alpha.4",
     "mocha": "*",
@@ -46,6 +47,7 @@
     "verb-tag-jscomments": ">= 0.1.4"
   },
   "dependencies": {
+    "debug": "^1.0.4",
     "lodash": "^2.4.1"
   }
 }

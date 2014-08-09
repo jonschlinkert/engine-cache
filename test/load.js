@@ -8,16 +8,15 @@
 'use strict';
 
 var should = require('should');
-var Engines = require('..');
-var engines = new Engines();
-
+var engines = require('..');
 
 describe('engines load', function() {
-  engines.load(require('engines'));
+  beforeEach(function() {
+    engines.clear();
+    engines.load(require('engines'));
+  });
 
-  var ctx = {
-    name: 'Jon Schlinkert'
-  };
+  var ctx = {name: 'Jon Schlinkert'};
 
   describe('.load()', function() {
     it('should load the cache with engines.', function() {

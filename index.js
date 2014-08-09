@@ -2,18 +2,7 @@
 
 
 var _ = require('lodash');
-
-
-/**
- * Noop
- *
- * @api private
- * @static
- */
-
-var noop = function(str) {
-  return str;
-};
+var debug = require('debug')('engine-cache');
 
 
 /**
@@ -32,13 +21,43 @@ var noop = function(str) {
  * @api public
  */
 
-function Engines (options) {
-  this.options = options || {};
-  this.noop = this.options.noop || '*';
-  this.cache = {};
-
-  this.defaultEngines();
+function engines (options) {
+  engines.init(options);
+  return engines;
 }
+
+
+/**
+ * Options cache
+ *
+ * @type {Object}
+ */
+
+engines.options = {};
+
+
+/**
+ * Engine cache
+ *
+ * @type {Object}
+ */
+
+engines.cache = {};
+
+
+/**
+ * Initialize defaults.
+ *
+ * @api private
+ */
+
+engines.init = function(opts) {
+  debug('init', arguments);
+  engines.options = {};
+  engines.cache = {};
+  engines.extend(opts);
+  engines.defaultEngines();
+};
 
 
 /**
@@ -47,10 +66,54 @@ function Engines (options) {
  * @api private
  */
 
-Engines.prototype.defaultEngines = function() {
-  this.register('*', {
-    render: noop
-  });
+engines.defaultEngines = function() {
+  debug('defaultEngines', arguments);
+  engines.register('tmpl', require('./defaults/lodash'));
+  engines.register('*', require('./defaults/noop'));
+};
+
+
+/**
+ * Extend the options.
+ *
+ * @api private
+ */
+
+engines.extend = function(opts) {
+  return _.extend(this.options, opts);
+};
+
+
+/**
+ * Set or get an option.
+ *
+ * ```js
+ * engines.option('a', true)
+ * engines.option('a')
+ * // => true
+ * ```
+ *
+ * @method option
+ * @param {String} `key`
+ * @param {*} `value`
+ * @return {*}
+ * @api public
+ */
+
+engines.option = function(key, value) {
+  var args = [].slice.call(arguments);
+
+  if (args.length === 1 && typeof key === 'string') {
+    return engines.options[key];
+  }
+
+  if (typeof key === 'object') {
+    _.extend.apply(_, [engines.options].concat(args));
+    return engines;
+  }
+
+  engines.options[key] = value;
+  return engines;
 };
 
 
@@ -65,7 +128,9 @@ Engines.prototype.defaultEngines = function() {
  * @api public
  */
 
-Engines.prototype.register = function (ext, options, fn) {
+engines.register = function (ext, options, fn) {
+  debug('register', arguments);
+
   var engine = {};
 
   if (arguments.length === 2) {
@@ -77,8 +142,8 @@ Engines.prototype.register = function (ext, options, fn) {
     engine = fn;
     engine.render = fn.render;
   } else if (typeof fn === 'object') {
-    engine = fn;
-    engine.renderFile = fn.renderFile || fn.__express || noop;
+    engine = fn || engines.noop;
+    engine.renderFile = fn.renderFile || fn.__express;
   }
 
   engine.options = fn.options || options || {};
@@ -90,6 +155,8 @@ Engines.prototype.register = function (ext, options, fn) {
   if (ext[0] !== '.') {
     ext = '.' + ext;
   }
+
+  debug('registered %s: %j', ext, engine);
 
   this.cache[ext] = engine;
   return this;
@@ -107,16 +174,18 @@ Engines.prototype.register = function (ext, options, fn) {
  * @api public
  */
 
-Engines.prototype.load = function(engines) {
-  var self = this;
-  _.forIn(engines, function (value, key) {
+engines.load = function(obj) {
+  debug('load', arguments);
+
+  _.forIn(obj, function (value, key) {
     if (value.hasOwnProperty('render')) {
-      self.register(key, value);
+      engines.register(key, value);
     }
   });
 
   return this;
 };
+
 
 /**
  * Return the engine stored by `ext`. If no `ext`
@@ -135,7 +204,11 @@ Engines.prototype.load = function(engines) {
  * @api public
  */
 
-Engines.prototype.get = function(ext) {
+engines.get = function(ext) {
+  if (!ext) {
+    return this.cache;
+  }
+
   ext = ext || this.noop;
   if (ext[0] !== '.') {
     ext = '.' + ext;
@@ -164,7 +237,7 @@ Engines.prototype.get = function(ext) {
  * @api public
  */
 
-Engines.prototype.clear = function(ext) {
+engines.clear = function(ext) {
   if (ext) {
     if (ext[0] !== '.') {
       ext = '.' + ext;
@@ -176,4 +249,4 @@ Engines.prototype.clear = function(ext) {
 };
 
 
-module.exports = Engines;
+module.exports = engines;

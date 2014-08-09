@@ -8,23 +8,33 @@
 'use strict';
 
 var should = require('should');
-var Engines = require('..');
-var engines = new Engines();
+var engines = require('..');
 
-describe('engines defaults', function() {
-  describe('.get()', function() {
-    it('should get the default engine.', function() {
+describe('engines defaults', function () {
+  before(function () {
+    engines.init();
+  });
+
+  describe('.get()', function () {
+    it('should get the default engine.', function () {
       engines.get('*').should.have.property('render');
     });
 
-    it('should render content with the default engine.', function() {
-      var noop = engines.get('*');
-      noop.render('foo').should.equal('foo');
+    it('should render content with the default engine.', function () {
+      var noop = engines.get('tmpl');
+      noop.render('<%= a %>', {a: 'A'}, function(err, content) {
+        content.should.equal('A');
+      });
     });
 
-    it('should render content with the default engine.', function() {
+    it('should render content with the default engine.', function () {
       var noop = engines.get('*');
-      noop.render('foo').should.equal('foo');
+      noop.renderSync('foo').should.equal('foo');
+    });
+
+    it('should render content with the default engine.', function () {
+      var noop = engines.get('tmpl');
+      noop.renderSync('<%= name %>', {name: 'Jon'}).should.equal('Jon');
     });
   });
 });

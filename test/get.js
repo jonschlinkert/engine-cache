@@ -8,8 +8,7 @@
 'use strict';
 
 var should = require('should');
-var Engines = require('..');
-var engines = new Engines();
+var engines = require('..');
 
 describe('engines register', function() {
   beforeEach(function() {
