@@ -3,10 +3,10 @@
 > express.js inspired template-engine manager.
 
 ## Install
-#### Install with [npm](npmjs.org):
+#### Install with [npm](npmjs.org)
 
 ```bash
-npm i engine-cache --save-dev
+npm i engine-cache --save
 ```
 
 ## Usage
