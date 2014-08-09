@@ -12,8 +12,8 @@ var debug = require('debug')('engine-cache');
  * **Example:**
  *
  * ```js
- * var Engines = require('engine-cache');
- * var engines = new Engines();
+ * var Engines = require('engine-cache')
+ * var engines = new Engines()
  * ```
  *
  * @class `Engines`
@@ -74,13 +74,23 @@ engines.defaultEngines = function() {
 
 
 /**
- * Extend the options.
+ * Extend the options with the given `obj`.
  *
- * @api private
+ * ```js
+ * engines.extend('a', true)
+ * engines.extend('a')
+ * // => true
+ * ```
+ *
+ * @method extend
+ * @param {Object} `obj`
+ * @return {Object} `engines` to enable chaining.
+ * @api public
  */
 
-engines.extend = function(opts) {
-  return _.extend(this.options, opts);
+engines.extend = function(obj) {
+  this.options = _.extend({}, this.options, obj);
+  return this;
 };
 
 
@@ -96,7 +106,7 @@ engines.extend = function(opts) {
  * @method option
  * @param {String} `key`
  * @param {*} `value`
- * @return {*}
+ * @return {Object} `engines` to enable chaining.
  * @api public
  */
 
@@ -120,11 +130,15 @@ engines.option = function(key, value) {
 /**
  * Register the given view engine callback `fn` as `ext`.
  *
+ * ```js
+ * var consolidate = require('consolidate')
+ * engines.register('hbs', consolidate.handlebars)
+ * ```
+ *
  * @param {String} `ext`
  * @param {Function|Object} `fn` or `options`
  * @param {Object} `options`
- * @return {Engines} for chaining
- * @chainable
+ * @return {Object} `engine` to enable chaining
  * @api public
  */
 
@@ -158,8 +172,8 @@ engines.register = function (ext, options, fn) {
 
   debug('registered %s: %j', ext, engine);
 
-  this.cache[ext] = engine;
-  return this;
+  engines.cache[ext] = engine;
+  return engines;
 };
 
 
@@ -168,9 +182,12 @@ engines.register = function (ext, options, fn) {
  * Mostly useful for testing, but exposed as
  * a public method.
  *
+ * ```js
+ * engines.load(require('consolidate'))
+ * ```
+ *
  * @param  {Object} `engines`
  * @return {Object} `Engines` to enable chaining.
- * @chainable
  * @api public
  */
 
@@ -183,7 +200,7 @@ engines.load = function(obj) {
     }
   });
 
-  return this;
+  return engines;
 };
 
 
@@ -192,9 +209,9 @@ engines.load = function(obj) {
  * is passed, the entire cache is returned.
  *
  * ```js
- * var consolidate = require('consolidate');
- * engine.set('hbs', consolidate.handlebars);
- * engine.get('hbs');
+ * var consolidate = require('consolidate')
+ * engine.set('hbs', consolidate.handlebars)
+ * engine.get('hbs')
  * // => {render: [function], renderFile: [function]}
  * ```
  *
@@ -229,7 +246,7 @@ engines.get = function(ext) {
  * **Example:**
  *
  * ```js
- * engines.clear();
+ * engines.clear()
  * ```
  *
  * @chainable

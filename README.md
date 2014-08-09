@@ -1,6 +1,6 @@
 # engine-cache [![NPM version](https://badge.fury.io/js/engine-cache.png)](http://badge.fury.io/js/engine-cache)
 
-> express inspired template-engine manager.
+> express.js inspired template-engine manager.
 
 ## Install
 #### Install with [npm](npmjs.org):
@@ -25,8 +25,22 @@ Create a new instance of `Engines`, optionally passing the default `options` to 
 **Example:**
 
 ```js
-var Engines = require('engine-cache');
-var engines = new Engines();
+var Engines = require('engine-cache')
+var engines = new Engines()
+```
+
+
+### .extend
+
+Extend the options with the given `obj`.
+
+* `obj` **{Object}**  
+* returns **{Object}** `engines`: to enable chaining.  
+
+```js
+engines.extend('a', true)
+engines.extend('a')
+// => true
 ```
 
 
@@ -36,7 +50,7 @@ Set or get an option.
 
 * `key` **{String}**  
 * `value` **{*}**  
-* returns: {*}  
+* returns **{Object}** `engines`: to enable chaining.  
 
 ```js
 engines.option('a', true)
@@ -47,22 +61,29 @@ engines.option('a')
 
 ### .register
 
-
+Register the given view engine callback `fn` as `ext`.
 
 * `ext` **{String}**  
 * `fn` **{Function|Object}**: or `options`  
 * `options` **{Object}**  
-* returns **{Engines}**: for chaining  Register the given view engine callback `fn` as `ext`.
+* returns **{Object}** `engine`: to enable chaining  
+
+```js
+var consolidate = require('consolidate')
+engines.register('hbs', consolidate.handlebars)
+```
 
 
 ### .load
 
-
+Load an object of engines onto the `cache`. Mostly useful for testing, but exposed as a public method.
 
 * `engines` **{Object}**  
-* returns **{Object}** `Engines`: to enable chaining.  Load an object of engines onto the `cache`.
-Mostly useful for testing, but exposed as
-a public method.
+* returns **{Object}** `Engines`: to enable chaining.  
+
+```js
+engines.load(require('consolidate'))
+```
 
 
 ### .get
@@ -73,9 +94,9 @@ Return the engine stored by `ext`. If no `ext` is passed, the entire cache is re
 * returns **{Object}**: The specified engine.  
 
 ```js
-var consolidate = require('consolidate');
-engine.set('hbs', consolidate.handlebars);
-engine.get('hbs');
+var consolidate = require('consolidate')
+engine.set('hbs', consolidate.handlebars)
+engine.get('hbs')
 // => {render: [function], renderFile: [function]}
 ```
 
@@ -88,7 +109,7 @@ Remove `ext` from the cache, or if no value is specified the entire cache is res
 **Example:**
 
 ```js
-engines.clear();
+engines.clear()
 ```
 
 ## Author
