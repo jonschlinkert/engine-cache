@@ -84,7 +84,7 @@ engines.defaultEngines = function() {
  * @param {String} `ext`
  * @param {Function|Object} `fn` or `options`
  * @param {Object} `options`
- * @return {Object} `engine` to enable chaining
+ * @return {engines} to enable chaining.
  * @api public
  */
 
@@ -132,8 +132,8 @@ engines.register = function (ext, options, fn) {
  * engines.load(require('consolidate'))
  * ```
  *
- * @param  {Engines}
- * @return {Object} `Engines` to enable chaining.
+ * @param  {Object} `obj` Engines to load.
+ * @return {engines} to enable chaining.
  * @api public
  */
 
@@ -224,7 +224,7 @@ engines.clear = function(ext) {
  * @method option
  * @param {String} `key`
  * @param {*} `value`
- * @return {Engines} to enable chaining.
+ * @return {engines} to enable chaining.
  * @api public
  */
 
@@ -256,7 +256,7 @@ engines.option = function(key, value) {
  *
  * @method extend
  * @param {Object} `obj`
- * @return {Engines} to enable chaining.
+ * @return {engines} to enable chaining.
  * @api public
  */
 

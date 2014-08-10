@@ -37,7 +37,7 @@ Register the given view engine callback `fn` as `ext`.
 * `ext` **{String}**  
 * `fn` **{Function|Object}**: or `options`  
 * `options` **{Object}**  
-* returns **{Object}** `engine`: to enable chaining  
+* returns **{engines}**: to enable chaining.  
 
 ```js
 var consolidate = require('consolidate')
@@ -49,8 +49,8 @@ engines.register('hbs', consolidate.handlebars)
 
 Load an object of engines onto the `cache`. Mostly useful for testing, but exposed as a public method.
 
-* `` **{}**: {Engines}  
-* returns **{Object}** `Engines`: to enable chaining.  
+* `obj` **{Object}**: Engines to load.  
+* returns **{engines}**: to enable chaining.  
 
 ```js
 engines.load(require('consolidate'))
@@ -90,7 +90,7 @@ Set or get an option.
 
 * `key` **{String}**  
 * `value` **{*}**  
-* returns **{Engines}**: to enable chaining.  
+* returns **{engines}**: to enable chaining.  
 
 ```js
 engines.option('a', true)
@@ -104,7 +104,7 @@ engines.option('a')
 Extend the options with the given `obj`.
 
 * `obj` **{Object}**  
-* returns **{Engines}**: to enable chaining.  
+* returns **{engines}**: to enable chaining.  
 
 ```js
 engines.extend({a: 'b'})
