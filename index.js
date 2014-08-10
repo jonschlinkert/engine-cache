@@ -74,60 +74,6 @@ engines.defaultEngines = function() {
 
 
 /**
- * Extend the options with the given `obj`.
- *
- * ```js
- * engines.extend('a', true)
- * engines.extend('a')
- * // => true
- * ```
- *
- * @method extend
- * @param {Object} `obj`
- * @return {Object} `engines` to enable chaining.
- * @api public
- */
-
-engines.extend = function(obj) {
-  this.options = _.extend({}, this.options, obj);
-  return this;
-};
-
-
-/**
- * Set or get an option.
- *
- * ```js
- * engines.option('a', true)
- * engines.option('a')
- * // => true
- * ```
- *
- * @method option
- * @param {String} `key`
- * @param {*} `value`
- * @return {Object} `engines` to enable chaining.
- * @api public
- */
-
-engines.option = function(key, value) {
-  var args = [].slice.call(arguments);
-
-  if (args.length === 1 && typeof key === 'string') {
-    return engines.options[key];
-  }
-
-  if (typeof key === 'object') {
-    _.extend.apply(_, [engines.options].concat(args));
-    return engines;
-  }
-
-  engines.options[key] = value;
-  return engines;
-};
-
-
-/**
  * Register the given view engine callback `fn` as `ext`.
  *
  * ```js
@@ -186,7 +132,7 @@ engines.register = function (ext, options, fn) {
  * engines.load(require('consolidate'))
  * ```
  *
- * @param  {Object} `engines`
+ * @param  {Engines}
  * @return {Object} `Engines` to enable chaining.
  * @api public
  */
@@ -263,6 +209,60 @@ engines.clear = function(ext) {
   } else {
     this.cache = {};
   }
+};
+
+
+/**
+ * Set or get an option.
+ *
+ * ```js
+ * engines.option('a', true)
+ * engines.option('a')
+ * // => true
+ * ```
+ *
+ * @method option
+ * @param {String} `key`
+ * @param {*} `value`
+ * @return {Engines} to enable chaining.
+ * @api public
+ */
+
+engines.option = function(key, value) {
+  var args = [].slice.call(arguments);
+
+  if (args.length === 1 && typeof key === 'string') {
+    return engines.options[key];
+  }
+
+  if (typeof key === 'object') {
+    _.extend.apply(_, [engines.options].concat(args));
+    return engines;
+  }
+
+  engines.options[key] = value;
+  return engines;
+};
+
+
+/**
+ * Extend the options with the given `obj`.
+ *
+ * ```js
+ * engines.extend({a: 'b'})
+ * engines.option('a')
+ * // => 'b'
+ * ```
+ *
+ * @method extend
+ * @param {Object} `obj`
+ * @return {Engines} to enable chaining.
+ * @api public
+ */
+
+engines.extend = function(obj) {
+  this.options = _.extend({}, this.options, obj);
+  return this;
 };
 
 
