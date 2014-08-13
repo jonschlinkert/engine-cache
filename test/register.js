@@ -7,6 +7,7 @@
 
 'use strict';
 
+var assert = require('assert');
 var should = require('should');
 var engines = require('..');
 
@@ -72,6 +73,11 @@ describe('engines register', function() {
         .register('d', {
           render: function () {}
         });
+
+
+      var a = engines.get('.a');
+      assert.equal(typeof a, 'object');
+      assert.equal(typeof a.render, 'function');
 
       engines.cache.should.have.property('.a');
       engines.cache.should.have.property('.b');

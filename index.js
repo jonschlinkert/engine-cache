@@ -6,17 +6,11 @@ var debug = require('debug')('engine-cache');
 
 
 /**
- * Create a new instance of `Engines`, optionally
- * passing the default `options` to use.
- *
- * **Example:**
- *
  * ```js
- * var Engines = require('engine-cache')
- * var engines = new Engines()
+ * var engines = require('engine-cache')
  * ```
  *
- * @class `Engines`
+ * @method `engines`
  * @param {Object} `options` Default options to use.
  * @api public
  */
@@ -53,10 +47,10 @@ engines.cache = {};
 
 engines.init = function(opts) {
   debug('init', arguments);
-  engines.options = {};
-  engines.cache = {};
-  engines.extend(opts);
-  engines.defaultEngines();
+  this.options = {};
+  this.cache = {};
+  this.extend(opts);
+  this.defaultEngines();
 };
 
 
@@ -68,8 +62,8 @@ engines.init = function(opts) {
 
 engines.defaultEngines = function() {
   debug('defaultEngines', arguments);
-  engines.register('tmpl', require('./defaults/lodash'));
-  engines.register('*', require('./defaults/noop'));
+  this.register('tmpl', require('./defaults/lodash'));
+  this.register('*', require('./defaults/noop'));
 };
 
 
@@ -89,7 +83,7 @@ engines.defaultEngines = function() {
  */
 
 engines.register = function (ext, options, fn) {
-  debug('register', arguments);
+  debug('[register]', arguments);
 
   var engine = {};
 
@@ -102,7 +96,7 @@ engines.register = function (ext, options, fn) {
     engine = fn;
     engine.render = fn.render;
   } else if (typeof fn === 'object') {
-    engine = fn || engines.noop;
+    engine = fn || this.noop;
     engine.renderFile = fn.renderFile || fn.__express;
   }
 
@@ -116,10 +110,10 @@ engines.register = function (ext, options, fn) {
     ext = '.' + ext;
   }
 
-  debug('registered %s: %j', ext, engine);
+  debug('[registered] %s: %j', ext, engine);
 
-  engines.cache[ext] = engine;
-  return engines;
+  this.cache[ext] = engine;
+  return this;
 };
 
 
@@ -138,15 +132,15 @@ engines.register = function (ext, options, fn) {
  */
 
 engines.load = function(obj) {
-  debug('load', arguments);
+  debug('[load]', arguments);
 
   _.forIn(obj, function (value, key) {
     if (value.hasOwnProperty('render')) {
-      engines.register(key, value);
+      this.register(key, value);
     }
-  });
+  }, this);
 
-  return engines;
+  return this;
 };
 
 
@@ -232,16 +226,16 @@ engines.option = function(key, value) {
   var args = [].slice.call(arguments);
 
   if (args.length === 1 && typeof key === 'string') {
-    return engines.options[key];
+    return this.options[key];
   }
 
   if (typeof key === 'object') {
-    _.extend.apply(_, [engines.options].concat(args));
-    return engines;
+    _.extend.apply(_, [this.options].concat(args));
+    return this;
   }
 
-  engines.options[key] = value;
-  return engines;
+  this.options[key] = value;
+  return this;
 };
 
 
