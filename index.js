@@ -49,8 +49,8 @@ engines.init = function(opts) {
   debug('init', arguments);
   this.options = {};
   this.cache = {};
-  this.extend(opts);
   this.defaultEngines();
+  this.extend(opts);
 };
 
 
@@ -83,11 +83,18 @@ engines.defaultEngines = function() {
  */
 
 engines.register = function (ext, options, fn) {
-  debug('[register]', arguments);
+  var args = [].slice.call(arguments);
 
+  debug('[register]', arguments);
   var engine = {};
 
-  if (arguments.length === 2) {
+  if (args.length === 3 && typeof options === 'function') {
+    var opts = fn;
+    fn = options;
+    options = opts;
+  }
+
+  if (args.length === 2) {
     fn = options;
     options = {};
   }
