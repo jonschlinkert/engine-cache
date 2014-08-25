@@ -174,14 +174,18 @@ engines.get = function(ext) {
     return this.cache;
   }
 
-  ext = ext || this.noop;
   if (ext[0] !== '.') {
     ext = '.' + ext;
   }
 
-  var engine = this.cache[ext];
+  var noop = this.noop || '*';
+  if (noop[0] !== '.') {
+    noop = '.' + noop;
+  }
+
+  var engine = this.cache[ext] || this.cache[noop];
   if (!engine) {
-    engine = this.cache['*'];
+    engine = this.cache['.*'];
   }
   return engine;
 };
