@@ -16,26 +16,10 @@ var debug = require('debug')('engine-cache');
  */
 
 function Engines (options) {
+  this.options = {};
+  this.engines = {};
   this.init(options);
 }
-
-
-/**
- * Options cache
- *
- * @type {Object}
- */
-
-Engines.prototype.options = {};
-
-
-/**
- * Engine cache
- *
- * @type {Object}
- */
-
-Engines.prototype.cache = {};
 
 
 /**
@@ -46,8 +30,6 @@ Engines.prototype.cache = {};
 
 Engines.prototype.init = function(opts) {
   debug('init', arguments);
-  this.options = {};
-  this.cache = {};
   this.defaultEngines();
   this.extend(opts);
 };
@@ -108,7 +90,7 @@ Engines.prototype.register = function (ext, options, fn) {
     engine = fn || this.noop;
     engine.renderFile = fn.renderFile || fn.__express;
   }
-
+  // console.log(engine)
   engine.options = fn.options || options || {};
 
   if (typeof engine.render !== 'function') {
@@ -121,7 +103,7 @@ Engines.prototype.register = function (ext, options, fn) {
 
   debug('[registered] %s: %j', ext, engine);
 
-  this.cache[ext] = engine;
+  this.engines[ext] = engine;
   return this;
 };
 
@@ -171,7 +153,7 @@ Engines.prototype.load = function(obj) {
 
 Engines.prototype.get = function(ext) {
   if (!ext) {
-    return this.cache;
+    return this.engines;
   }
 
   if (ext[0] !== '.') {
@@ -183,9 +165,9 @@ Engines.prototype.get = function(ext) {
     noop = '.' + noop;
   }
 
-  var engine = this.cache[ext] || this.cache[noop];
+  var engine = this.engines[ext] || this.engines[noop];
   if (!engine) {
-    engine = this.cache['.*'];
+    engine = this.engines['.*'];
   }
   return engine;
 };
@@ -210,9 +192,9 @@ Engines.prototype.clear = function(ext) {
     if (ext[0] !== '.') {
       ext = '.' + ext;
     }
-    delete this.cache[ext];
+    delete this.engines[ext];
   } else {
-    this.cache = {};
+    this.engines = {};
   }
 };
 

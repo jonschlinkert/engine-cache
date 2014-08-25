@@ -32,7 +32,7 @@ describe('engines register', function() {
         render: function () {}
       });
 
-      Object.keys(engines.cache).length.should.equal(4);
+      Object.keys(engines.engines).length.should.equal(4);
 
       engines.get('a').should.have.property('render');
       engines.get('b').should.have.property('render');
