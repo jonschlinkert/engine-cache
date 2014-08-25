@@ -10,7 +10,6 @@ var debug = require('debug')('engine-cache');
  * var engines = require('engine-cache')
  * ```
  *
- * @method `engines`
  * @param {Object} `options` Default options to use.
  * @api public
  */
@@ -76,9 +75,12 @@ engines.defaultEngines = function() {
  * ```
  *
  * @param {String} `ext`
- * @param {Function|Object} `fn` or `options`
- * @param {Object} `options`
- * @return {engines} to enable chaining.
+ * @param {Object|Function} `options` or callback `fn`.
+ *   @option {String} [options] `a` This is a
+ *   @option {String} [options] `b` This is b
+ *   @option {String} [options] `c` This is c
+ * @param {Function} `fn` Callback.
+ * @return {object} `engines` to enable chaining.
  * @api public
  */
 
@@ -134,7 +136,7 @@ engines.register = function (ext, options, fn) {
  * ```
  *
  * @param  {Object} `obj` Engines to load.
- * @return {engines} to enable chaining.
+ * @return {object} `engines` to enable chaining.
  * @api public
  */
 
@@ -162,7 +164,6 @@ engines.load = function(obj) {
  * // => {render: [function], renderFile: [function]}
  * ```
  *
- * @method get
  * @param {String} `ext` The engine to get.
  * @return {Object} The specified engine.
  * @api public
@@ -187,7 +188,7 @@ engines.get = function(ext) {
 
 
 /**
- * Remove `ext` from the cache, or if no value is
+ * Remove `ext` engine from the cache, or if no value is
  * specified the entire cache is reset.
  *
  * **Example:**
@@ -196,8 +197,7 @@ engines.get = function(ext) {
  * engines.clear()
  * ```
  *
- * @chainable
- * @method clear
+ * @param {String} `ext` The engine to remove.
  * @api public
  */
 
@@ -222,10 +222,9 @@ engines.clear = function(ext) {
  * // => true
  * ```
  *
- * @method option
  * @param {String} `key`
  * @param {*} `value`
- * @return {engines} to enable chaining.
+ * @return {object} `engines` to enable chaining.
  * @api public
  */
 
@@ -255,9 +254,8 @@ engines.option = function(key, value) {
  * // => 'b'
  * ```
  *
- * @method extend
  * @param {Object} `obj`
- * @return {engines} to enable chaining.
+ * @return {object} `engines` to enable chaining.
  * @api public
  */
 
