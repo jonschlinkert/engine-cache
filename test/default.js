@@ -8,7 +8,9 @@
 'use strict';
 
 var should = require('should');
-var engines = require('..');
+var Engines = require('..');
+var engines = new Engines();
+
 
 describe('engines defaults', function () {
   before(function () {
@@ -20,21 +22,29 @@ describe('engines defaults', function () {
       engines.get('*').should.have.property('render');
     });
 
-    it('should render content with the default engine.', function () {
-      var noop = engines.get('tmpl');
-      noop.render('<%= a %>', {a: 'A'}, function(err, content) {
+    it('should render content with the default template engine.', function () {
+      var lodash = engines.get('tmpl');
+      lodash.render('<%= a %>', {a: 'A'}, function(err, content) {
         content.should.equal('A');
       });
     });
 
-    it('should render content with the default engine.', function () {
+    it('should render content with the default noop engine.', function () {
+      var noop = engines.get('*');
+
+      noop.render('<%= a %>', function(err, content) {
+        content.should.equal('<%= a %>');
+      });
+    });
+
+    it('should synchronously render content with the default noop engine.', function () {
       var noop = engines.get('*');
       noop.renderSync('foo').should.equal('foo');
     });
 
     it('should render content with the default engine.', function () {
-      var noop = engines.get('tmpl');
-      noop.renderSync('<%= name %>', {name: 'Jon'}).should.equal('Jon');
+      var lodash = engines.get('tmpl');
+      lodash.renderSync('<%= name %>', {name: 'Jon'}).should.equal('Jon');
     });
   });
 });

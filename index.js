@@ -7,47 +7,29 @@ var debug = require('debug')('engine-cache');
 
 /**
  * ```js
- * var engines = require('engine-cache')
+ * var Engines = require('engine-cache');
+ * var engines = new Engines();
  * ```
  *
  * @param {Object} `options` Default options to use.
  * @api public
  */
 
-function engines (options) {
-  engines.init(options);
-  return engines;
+function Engines (options) {
+  this.engines = {};
+  this.options = {};
+  this.init(options);
 }
 
 
 /**
- * Options cache
- *
- * @type {Object}
- */
-
-engines.options = {};
-
-
-/**
- * Engine cache
- *
- * @type {Object}
- */
-
-engines.cache = {};
-
-
-/**
- * Initialize defaults.
+ * Initialize default configuration.
  *
  * @api private
  */
 
-engines.init = function(opts) {
+Engines.prototype.init = function(opts) {
   debug('init', arguments);
-  this.options = {};
-  this.cache = {};
   this.defaultEngines();
   this.extend(opts);
 };
@@ -59,10 +41,10 @@ engines.init = function(opts) {
  * @api private
  */
 
-engines.defaultEngines = function() {
+Engines.prototype.defaultEngines = function() {
   debug('defaultEngines', arguments);
-  this.register('tmpl', require('./defaults/lodash'));
-  this.register('*', require('./defaults/noop'));
+  this.register('tmpl', require('engine-lodash'));
+  this.register('*', require('engine-noop'));
 };
 
 
@@ -84,7 +66,7 @@ engines.defaultEngines = function() {
  * @api public
  */
 
-engines.register = function (ext, options, fn) {
+Engines.prototype.register = function (ext, options, fn) {
   var args = [].slice.call(arguments);
 
   debug('[register]', arguments);
@@ -108,7 +90,7 @@ engines.register = function (ext, options, fn) {
     engine = fn || this.noop;
     engine.renderFile = fn.renderFile || fn.__express;
   }
-
+  // console.log(engine)
   engine.options = fn.options || options || {};
 
   if (typeof engine.render !== 'function') {
@@ -121,7 +103,7 @@ engines.register = function (ext, options, fn) {
 
   debug('[registered] %s: %j', ext, engine);
 
-  this.cache[ext] = engine;
+  this.engines[ext] = engine;
   return this;
 };
 
@@ -140,7 +122,7 @@ engines.register = function (ext, options, fn) {
  * @api public
  */
 
-engines.load = function(obj) {
+Engines.prototype.load = function(obj) {
   debug('[load]', arguments);
 
   _.forIn(obj, function (value, key) {
@@ -169,9 +151,9 @@ engines.load = function(obj) {
  * @api public
  */
 
-engines.get = function(ext) {
+Engines.prototype.get = function(ext) {
   if (!ext) {
-    return this.cache;
+    return this.engines;
   }
 
   if (ext[0] !== '.') {
@@ -183,9 +165,9 @@ engines.get = function(ext) {
     noop = '.' + noop;
   }
 
-  var engine = this.cache[ext] || this.cache[noop];
+  var engine = this.engines[ext] || this.engines[noop];
   if (!engine) {
-    engine = this.cache['.*'];
+    engine = this.engines['.*'];
   }
   return engine;
 };
@@ -205,14 +187,14 @@ engines.get = function(ext) {
  * @api public
  */
 
-engines.clear = function(ext) {
+Engines.prototype.clear = function(ext) {
   if (ext) {
     if (ext[0] !== '.') {
       ext = '.' + ext;
     }
-    delete this.cache[ext];
+    delete this.engines[ext];
   } else {
-    this.cache = {};
+    this.engines = {};
   }
 };
 
@@ -232,7 +214,7 @@ engines.clear = function(ext) {
  * @api public
  */
 
-engines.option = function(key, value) {
+Engines.prototype.option = function(key, value) {
   var args = [].slice.call(arguments);
 
   if (args.length === 1 && typeof key === 'string') {
@@ -263,10 +245,10 @@ engines.option = function(key, value) {
  * @api public
  */
 
-engines.extend = function(obj) {
+Engines.prototype.extend = function(obj) {
   this.options = _.extend({}, this.options, obj);
   return this;
 };
 
 
-module.exports = engines;
+module.exports = Engines;

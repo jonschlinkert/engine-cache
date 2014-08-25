@@ -8,7 +8,9 @@
 'use strict';
 
 var should = require('should');
-var engines = require('..');
+var Engines = require('..');
+var engines = new Engines();
+
 
 describe('engines register', function() {
   beforeEach(function() {
@@ -30,22 +32,22 @@ describe('engines register', function() {
         render: function () {}
       });
 
-      engines.cache.should.have.property('.a');
-      engines.cache.should.have.property('.b');
-      engines.cache.should.have.property('.c');
-      engines.cache.should.have.property('.d');
-      Object.keys(engines.cache).length.should.equal(4);
+      engines.engines.should.have.property('.a');
+      engines.engines.should.have.property('.b');
+      engines.engines.should.have.property('.c');
+      engines.engines.should.have.property('.d');
+      Object.keys(engines.engines).length.should.equal(4);
 
 
       engines.clear('a');
-      engines.cache.should.not.have.property('.a');
-      engines.cache.should.have.property('.b');
-      Object.keys(engines.cache).length.should.equal(3);
+      engines.engines.should.not.have.property('.a');
+      engines.engines.should.have.property('.b');
+      Object.keys(engines.engines).length.should.equal(3);
 
       engines.clear('b');
-      engines.cache.should.not.have.property('.a');
-      engines.cache.should.not.have.property('.b');
-      Object.keys(engines.cache).length.should.equal(2);
+      engines.engines.should.not.have.property('.a');
+      engines.engines.should.not.have.property('.b');
+      Object.keys(engines.engines).length.should.equal(2);
     });
   });
 });

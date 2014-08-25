@@ -9,7 +9,8 @@
 
 var assert = require('assert');
 var should = require('should');
-var engines = require('..');
+var Engines = require('..');
+var engines = new Engines();
 
 describe('engines register', function() {
   beforeEach(function() {
@@ -17,7 +18,7 @@ describe('engines register', function() {
   });
 
   describe('.register()', function() {
-    it('should register engines to the `cache` object.', function() {
+    it('should register engines to the `engines` object.', function() {
       engines.register('a', {
         render: function () {}
       });
@@ -31,11 +32,11 @@ describe('engines register', function() {
         render: function () {}
       });
 
-      engines.cache.should.have.property('.a');
-      engines.cache.should.have.property('.b');
-      engines.cache.should.have.property('.c');
-      engines.cache.should.have.property('.d');
-      Object.keys(engines.cache).length.should.equal(4);
+      engines.engines.should.have.property('.a');
+      engines.engines.should.have.property('.b');
+      engines.engines.should.have.property('.c');
+      engines.engines.should.have.property('.d');
+      Object.keys(engines.engines).length.should.equal(4);
     });
 
     it('should normalize engine extensions to not have a dot.', function() {
@@ -52,11 +53,11 @@ describe('engines register', function() {
         render: function () {}
       });
 
-      engines.cache.should.have.property('.a');
-      engines.cache.should.have.property('.b');
-      engines.cache.should.have.property('.c');
-      engines.cache.should.have.property('.d');
-      Object.keys(engines.cache).length.should.equal(4);
+      engines.engines.should.have.property('.a');
+      engines.engines.should.have.property('.b');
+      engines.engines.should.have.property('.c');
+      engines.engines.should.have.property('.d');
+      Object.keys(engines.engines).length.should.equal(4);
     });
 
     it('should be chainable.', function() {
@@ -79,11 +80,11 @@ describe('engines register', function() {
       assert.equal(typeof a, 'object');
       assert.equal(typeof a.render, 'function');
 
-      engines.cache.should.have.property('.a');
-      engines.cache.should.have.property('.b');
-      engines.cache.should.have.property('.c');
-      engines.cache.should.have.property('.d');
-      Object.keys(engines.cache).length.should.equal(4);
+      engines.engines.should.have.property('.a');
+      engines.engines.should.have.property('.b');
+      engines.engines.should.have.property('.c');
+      engines.engines.should.have.property('.d');
+      Object.keys(engines.engines).length.should.equal(4);
     });
   });
 });

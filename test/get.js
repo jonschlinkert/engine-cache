@@ -8,7 +8,9 @@
 'use strict';
 
 var should = require('should');
-var engines = require('..');
+var Engines = require('..');
+var engines = new Engines();
+
 
 describe('engines register', function() {
   beforeEach(function() {
@@ -30,7 +32,7 @@ describe('engines register', function() {
         render: function () {}
       });
 
-      Object.keys(engines.cache).length.should.equal(4);
+      Object.keys(engines.engines).length.should.equal(4);
 
       engines.get('a').should.have.property('render');
       engines.get('b').should.have.property('render');
