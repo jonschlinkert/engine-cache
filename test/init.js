@@ -8,8 +8,8 @@
 'use strict';
 
 var should = require('should');
-var engines = require('..');
-
+var Engines = require('..');
+var engines = new Engines();
 
 describe('engines init', function() {
   beforeEach(function() {

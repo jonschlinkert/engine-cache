@@ -9,7 +9,8 @@
 
 var assert = require('assert');
 var should = require('should');
-var engines = require('..');
+var Engines = require('..');
+var engines = new Engines();
 
 describe('engines register', function() {
   beforeEach(function() {

@@ -9,7 +9,8 @@
 
 var should = require('should');
 var lodash = require('engine-lodash');
-var engines = require('..');
+var Engines = require('..');
+var engines = new Engines();
 
 describe('engines', function() {
   after(function() {
