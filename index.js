@@ -16,14 +16,14 @@ var debug = require('debug')('engine-cache');
  */
 
 function Engines (options) {
-  this.options = {};
   this.engines = {};
+  this.options = {};
   this.init(options);
 }
 
 
 /**
- * Initialize defaults.
+ * Initialize default configuration.
  *
  * @api private
  */
@@ -43,8 +43,8 @@ Engines.prototype.init = function(opts) {
 
 Engines.prototype.defaultEngines = function() {
   debug('defaultEngines', arguments);
-  this.register('tmpl', require('./defaults/lodash'));
-  this.register('*', require('./defaults/noop'));
+  this.register('tmpl', require('engine-lodash'));
+  this.register('*', require('engine-noop'));
 };
 
 
