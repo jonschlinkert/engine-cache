@@ -17,8 +17,7 @@ var _ = require('lodash');
  */
 
 function Engines (engines) {
-  this.engines = engines || {};
-  this.init();
+  this.init(engines);
 }
 
 
@@ -28,8 +27,9 @@ function Engines (engines) {
  * @api private
  */
 
-Engines.prototype.init = function() {
+Engines.prototype.init = function(engines) {
   debug('init', arguments);
+  this.engines = engines || {};
   this.defaultEngines();
 };
 
@@ -160,10 +160,10 @@ Engines.prototype.get = function(ext) {
   }
 
   var engine = this.engines[ext];
-
   if (!engine) {
     engine = this.engines['.*'];
   }
+
   return engine;
 };
 

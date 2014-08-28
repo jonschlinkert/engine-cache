@@ -7,6 +7,7 @@
 
 'use strict';
 
+var assert = require('assert');
 var should = require('should');
 var Engines = require('..');
 var engines = new Engines();
@@ -14,20 +15,36 @@ var engines = new Engines();
 
 describe('engines register', function() {
   beforeEach(function() {
-    engines.clear();
+    engines.init();
   });
 
-  describe('.remove()', function() {
-    it('should remove a property from the `cache` object.', function() {
+  describe('.helpers()', function() {
+    it('should add a helper to the `cache` for the given engine.', function() {
       engines.register('a', {
         render: function () {}
       });
 
       var helpers = engines.helpers('a');
       helpers.set('foo', function() {});
-      var foo = helpers.get('foo');
 
       helpers.get('foo').should.be.a.function;
+    });
+
+    it('should get the helpers for the given engine.', function() {
+      engines.register('a', {
+        render: function () {}
+      });
+
+      var helpers = engines.helpers('a');
+      helpers.set('foo', function() {});
+
+      helpers.get().should.be.an.object;
+    });
+
+    it('should get the helpers for the given engine.', function() {
+      var helpers = engines.helpers('a');
+
+      assert.equal(typeof helpers, 'object');
     });
   });
 });
