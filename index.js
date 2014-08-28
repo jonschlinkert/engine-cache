@@ -96,6 +96,8 @@ Engines.prototype.register = function (ext, options, fn) {
     throw new Error('Engines are expected to have a `render` method.');
   }
 
+  this.wrapEngine(engine);
+
   if (ext[0] !== '.') {
     ext = '.' + ext;
   }
@@ -104,6 +106,39 @@ Engines.prototype.register = function (ext, options, fn) {
   this.engines[ext] = engine;
 
   return this;
+};
+
+
+/**
+ * Wrap an engine to extend the helpers object and other
+ * native methods or functionality.
+ *
+ * ```js
+ * engines.wrapEngine(engine);
+ * ```
+ *
+ * @param  {Object} `engine` The engine to wrap.
+ * @return {Object} `engine` The wrapped engine.
+ * @api public
+ */
+
+Engines.prototype.wrapEngine = function(engine) {
+  debug('[wrapEngine]', arguments);
+
+  var render = engine.render;
+
+  engine.render = function(str, options, callback) {
+    if (typeof options === 'function') {
+      callback = options;
+      options = {};
+    }
+
+
+    var o = _.extend({}, options);
+    o.helpers = _.extend({}, engine.helpers, o.helpers);
+
+    return render.call(this, str, o, callback);
+  };
 };
 
 

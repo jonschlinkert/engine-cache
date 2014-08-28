@@ -43,7 +43,18 @@ var consolidate = require('consolidate')
 engines.register('hbs', consolidate.handlebars)
 ```
 
-### [.load](index.js#L124)
+### [.wrapEngine](index.js#L125)
+
+Wrap an engine to extend the helpers object and other native methods or functionality.
+
+* `engine` **{Object}**: The engine to wrap.    
+* `returns` **{Object}** `engine`: The wrapped engine.  
+
+```js
+engines.wrapEngine(engine);
+```
+
+### [.load](index.js#L159)
 
 Load an object of engines onto the `cache`. Mostly useful for testing, but exposed as a public method.
 
@@ -54,7 +65,7 @@ Load an object of engines onto the `cache`. Mostly useful for testing, but expos
 engines.load(require('consolidate'))
 ```
 
-### [.get](index.js#L153)
+### [.get](index.js#L188)
 
 Return the engine stored by `ext`. If no `ext` is passed, the entire cache is returned.
 
@@ -68,7 +79,7 @@ engine.get('hbs')
 // => {render: [function], renderFile: [function]}
 ```
 
-### [.helpers](index.js#L180)
+### [.helpers](index.js#L215)
 
 * `ext` **{String}**: The helper cache to get and set to.    
 * `returns` **{Object}**: Object of helpers for the specified engine.  
@@ -76,7 +87,7 @@ engine.get('hbs')
 Get and set helpers for the given `ext` (engine). If no
 `ext` is passed, the entire helper cache is returned.
 
-### [.clear](index.js#L199)
+### [.clear](index.js#L234)
 
 Remove `ext` engine from the cache, or if no value is specified the entire cache is reset.
 
