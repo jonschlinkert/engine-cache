@@ -22,12 +22,6 @@ describe('engines defaults', function () {
       engines.get('*').should.have.property('render');
     });
 
-    it('should render content with the default template engine.', function () {
-      var lodash = engines.get('tmpl');
-      lodash.render('<%= a %>', {a: 'A'}, function(err, content) {
-        content.should.equal('A');
-      });
-    });
 
     it('should render content with the default noop engine.', function () {
       var noop = engines.get('*');
@@ -42,9 +36,5 @@ describe('engines defaults', function () {
       noop.renderSync('foo').should.equal('foo');
     });
 
-    it('should render content with the default engine.', function () {
-      var lodash = engines.get('tmpl');
-      lodash.renderSync('<%= name %>', {name: 'Jon'}).should.equal('Jon');
-    });
   });
 });

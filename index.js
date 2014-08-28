@@ -1,8 +1,9 @@
 'use strict';
 
 
-var _ = require('lodash');
 var debug = require('debug')('engine-cache');
+var Helpers = require('helper-cache');
+var _ = require('lodash');
 
 
 /**
@@ -15,10 +16,9 @@ var debug = require('debug')('engine-cache');
  * @api public
  */
 
-function Engines (options) {
-  this.engines = {};
-  this.options = {};
-  this.init(options);
+function Engines (engines) {
+  this.engines = engines || {};
+  this.init();
 }
 
 
@@ -28,10 +28,9 @@ function Engines (options) {
  * @api private
  */
 
-Engines.prototype.init = function(opts) {
+Engines.prototype.init = function() {
   debug('init', arguments);
   this.defaultEngines();
-  this.extend(opts);
 };
 
 
@@ -43,7 +42,6 @@ Engines.prototype.init = function(opts) {
 
 Engines.prototype.defaultEngines = function() {
   debug('defaultEngines', arguments);
-  this.register('tmpl', require('engine-lodash'));
   this.register('*', require('engine-noop'));
 };
 
@@ -90,8 +88,9 @@ Engines.prototype.register = function (ext, options, fn) {
     engine = fn || this.noop;
     engine.renderFile = fn.renderFile || fn.__express;
   }
-  // console.log(engine)
+
   engine.options = fn.options || options || {};
+  engine.helpers = new Helpers();
 
   if (typeof engine.render !== 'function') {
     throw new Error('Engines are expected to have a `render` method.');
@@ -102,8 +101,8 @@ Engines.prototype.register = function (ext, options, fn) {
   }
 
   debug('[registered] %s: %j', ext, engine);
-
   this.engines[ext] = engine;
+
   return this;
 };
 
@@ -160,16 +159,26 @@ Engines.prototype.get = function(ext) {
     ext = '.' + ext;
   }
 
-  var noop = this.noop || '*';
-  if (noop[0] !== '.') {
-    noop = '.' + noop;
-  }
+  var engine = this.engines[ext];
 
-  var engine = this.engines[ext] || this.engines[noop];
   if (!engine) {
     engine = this.engines['.*'];
   }
   return engine;
+};
+
+
+/**
+ * Get and set helpers for the given `ext` (engine). If no
+ * `ext` is passed, the entire helper cache is returned.
+ *
+ * @param {String} `ext` The helper cache to get and set to.
+ * @return {Object} Object of helpers for the specified engine.
+ * @api public
+ */
+
+Engines.prototype.helpers = function (ext) {
+  return this.get(ext).helpers;
 };
 
 
@@ -198,57 +207,10 @@ Engines.prototype.clear = function(ext) {
   }
 };
 
-
 /**
- * Set or get an option.
+ * Export `Engines`
  *
- * ```js
- * engines.option('a', true)
- * engines.option('a')
- * // => true
- * ```
- *
- * @param {String} `key`
- * @param {*} `value`
- * @return {object} `engines` to enable chaining.
- * @api public
+ * @type {Object}
  */
-
-Engines.prototype.option = function(key, value) {
-  var args = [].slice.call(arguments);
-
-  if (args.length === 1 && typeof key === 'string') {
-    return this.options[key];
-  }
-
-  if (typeof key === 'object') {
-    _.extend.apply(_, [this.options].concat(args));
-    return this;
-  }
-
-  this.options[key] = value;
-  return this;
-};
-
-
-/**
- * Extend the options with the given `obj`.
- *
- * ```js
- * engines.extend({a: 'b'})
- * engines.option('a')
- * // => 'b'
- * ```
- *
- * @param {Object} `obj`
- * @return {object} `engines` to enable chaining.
- * @api public
- */
-
-Engines.prototype.extend = function(obj) {
-  this.options = _.extend({}, this.options, obj);
-  return this;
-};
-
 
 module.exports = Engines;
