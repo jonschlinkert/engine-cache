@@ -56,16 +56,13 @@ Engines.prototype.defaultEngines = function() {
  *
  * @param {String} `ext`
  * @param {Object|Function} `options` or callback `fn`.
- *   @option {String} [options] `a` This is a
- *   @option {String} [options] `b` This is b
- *   @option {String} [options] `c` This is c
  * @param {Function} `fn` Callback.
  * @return {object} `engines` to enable chaining.
  * @api public
  */
 
 Engines.prototype.register = function (ext, options, fn) {
-  var args = [].slice.call(arguments);
+  var args = [].slice.call(arguments).filter(Boolean);
 
   debug('[register]', arguments);
   var engine = {};
@@ -124,7 +121,6 @@ Engines.prototype.register = function (ext, options, fn) {
 
 Engines.prototype.wrapEngine = function(engine) {
   debug('[wrapEngine]', arguments);
-
   var render = engine.render;
 
   engine.render = function(str, options, callback) {
@@ -132,12 +128,10 @@ Engines.prototype.wrapEngine = function(engine) {
       callback = options;
       options = {};
     }
+    var opts = _.extend({}, options);
 
-
-    var o = _.extend({}, options);
-    o.helpers = _.extend({}, engine.helpers, o.helpers);
-
-    return render.call(this, str, o, callback);
+    opts.helpers = _.extend({}, engine.helpers, opts.helpers);
+    return render.call(this, str, opts, callback);
   };
 };
 
