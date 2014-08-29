@@ -25,9 +25,8 @@ describe('engines register', function() {
       });
 
       var helpers = engines.helpers('a');
-      helpers.set('foo', function() {});
-
-      helpers.get('foo').should.be.a.function;
+      helpers.addHelper('foo', function() {});
+      helpers.getHelper('foo').should.be.a.function;
     });
 
     it('should get the helpers for the given engine.', function() {
@@ -36,9 +35,8 @@ describe('engines register', function() {
       });
 
       var helpers = engines.helpers('a');
-      helpers.set('foo', function() {});
-
-      helpers.get().should.be.an.object;
+      helpers.addHelper('foo', function() {});
+      helpers.getHelper().should.be.an.object;
     });
 
     it('should get the helpers for the given engine.', function() {

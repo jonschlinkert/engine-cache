@@ -57,7 +57,7 @@ Engines.prototype.defaultEngines = function() {
  * @param {String} `ext`
  * @param {Object|Function} `options` or callback `fn`.
  * @param {Function} `fn` Callback.
- * @return {object} `engines` to enable chaining.
+ * @return {Object} `Engines` to enable chaining.
  * @api public
  */
 
@@ -146,7 +146,7 @@ Engines.prototype.wrapEngine = function(engine) {
  * ```
  *
  * @param  {Object} `obj` Engines to load.
- * @return {object} `engines` to enable chaining.
+ * @return {Object} `Engines` to enable chaining.
  * @api public
  */
 
@@ -200,6 +200,17 @@ Engines.prototype.get = function(ext) {
 /**
  * Get and set helpers for the given `ext` (engine). If no
  * `ext` is passed, the entire helper cache is returned.
+ *
+ * **Example:**
+ *
+ * ```js
+ * var helpers = engines.helpers('hbs');
+ * helpers.addHelper('foo', function() {});
+ * helpers.getHelper('foo');
+ * helpers.getHelper();
+ * ```
+ *
+ * See [helper-cache] for any related issues, API details, and documentation.
  *
  * @param {String} `ext` The helper cache to get and set to.
  * @return {Object} Object of helpers for the specified engine.
