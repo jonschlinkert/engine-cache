@@ -1,12 +1,18 @@
 {
   "name": "engine-cache",
   "description": "express.js inspired template-engine manager.",
-  "version": "0.2.2",
+  "version": "0.2.3",
   "homepage": "https://github.com/jonschlinkert/engine-cache",
   "author": {
     "name": "Jon Schlinkert",
     "url": "https://github.com/jonschlinkert"
   },
+  "maintainers": [
+    {
+      "name": "Brian Woodward",
+      "url": "https://github.com/doowb"
+    }
+  ],
   "repository": {
     "type": "git",
     "url": "git://github.com/jonschlinkert/engine-cache.git"
@@ -21,10 +27,39 @@
     }
   ],
   "keywords": [
-    "engines",
-    "template",
+    "assemble",
     "cache",
-    "engine"
+    "compile",
+    "consolidate",
+    "content",
+    "data",
+    "delimiters",
+    "delims",
+    "docs",
+    "documentation",
+    "engine",
+    "engines",
+    "express",
+    "front",
+    "generate",
+    "generator",
+    "gray-matter",
+    "lo-dash",
+    "lodash",
+    "markdown",
+    "matter",
+    "noop",
+    "parse",
+    "parser",
+    "parsers",
+    "pass-through",
+    "process",
+    "render",
+    "template",
+    "templates",
+    "underscore",
+    "verb",
+    "yaml"
   ],
   "main": "index.js",
   "engines": {
