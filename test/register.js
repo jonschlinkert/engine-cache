@@ -86,5 +86,43 @@ describe('engines register', function() {
       engines.engines.should.have.property('.d');
       Object.keys(engines.engines).length.should.equal(4);
     });
+
+    it('should allow options to be passed as the last argument.', function() {
+      engines
+        .register('a', {render: function () {}}, {foo: 'bar'})
+        .register('b', {render: function () {}}, {foo: 'bar'})
+        .register('c', {render: function () {}}, {foo: 'bar'})
+        .register('d', {render: function () {}}, {foo: 'bar'});
+
+      var a = engines.get('.a');
+      assert.equal(typeof a, 'object');
+      assert.equal(typeof a.render, 'function');
+      assert.equal(typeof a.options.foo, 'string');
+
+      engines.engines.should.have.property('.a');
+      engines.engines.should.have.property('.b');
+      engines.engines.should.have.property('.c');
+      engines.engines.should.have.property('.d');
+      Object.keys(engines.engines).length.should.equal(4);
+    });
+
+    it('should allow options to be passed as the second argument.', function() {
+      engines
+        .register('a', {foo: 'bar'}, {render: function () {}})
+        .register('b', {foo: 'bar'}, {render: function () {}})
+        .register('c', {foo: 'bar'}, {render: function () {}})
+        .register('d', {foo: 'bar'}, {render: function () {}});
+
+      var a = engines.get('.a');
+      assert.equal(typeof a, 'object');
+      assert.equal(typeof a.render, 'function');
+      assert.equal(typeof a.options.foo, 'string');
+
+      engines.engines.should.have.property('.a');
+      engines.engines.should.have.property('.b');
+      engines.engines.should.have.property('.c');
+      engines.engines.should.have.property('.d');
+      Object.keys(engines.engines).length.should.equal(4);
+    });
   });
 });

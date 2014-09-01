@@ -62,21 +62,20 @@ Engines.prototype.defaultEngines = function() {
  * @api public
  */
 
-Engines.prototype.register = function (ext, options, fn) {
+Engines.prototype.register = function (ext, fn, options) {
   var args = [].slice.call(arguments).filter(Boolean);
 
   debug('[register]', arguments);
   var engine = {};
 
-  if (args.length === 3 && typeof options === 'function') {
-    var opts = fn;
-    fn = options;
-    options = opts;
-  }
-
-  if (args.length === 2) {
-    fn = options;
-    options = {};
+  if (args.length === 3) {
+    if (options && (typeof options === 'function' ||
+        options.hasOwnProperty('render') ||
+        options.hasOwnProperty('renderFile'))) {
+      var opts = fn;
+      fn = options;
+      options = opts;
+    }
   }
 
   if (typeof fn === 'function') {
