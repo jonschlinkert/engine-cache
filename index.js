@@ -4,6 +4,7 @@
 var debug = require('debug')('engine-cache');
 var Helpers = require('helper-cache');
 var _ = require('lodash');
+var extend = _.extend;
 
 
 /**
@@ -107,7 +108,7 @@ Engines.prototype.register = function (ext, options, fn) {
 
 
 /**
- * Wrap an engine to extend the helpers object and other
+ * Wrap engines to extend the helpers object and other
  * native methods or functionality.
  *
  * ```js
@@ -115,7 +116,7 @@ Engines.prototype.register = function (ext, options, fn) {
  * ```
  *
  * @param  {Object} `engine` The engine to wrap.
- * @return {Object} `engine` The wrapped engine.
+ * @return {Object} The wrapped engine.
  * @api public
  */
 
@@ -128,9 +129,10 @@ Engines.prototype.wrapEngine = function(engine) {
       callback = options;
       options = {};
     }
-    var opts = _.extend({}, options);
 
-    opts.helpers = _.extend({}, engine.helpers, opts.helpers);
+    var opts = extend({}, options);
+
+    opts.helpers = extend({}, engine.helpers, opts.helpers);
     return render.call(this, str, opts, callback);
   };
 };
