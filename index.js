@@ -87,7 +87,7 @@ Engines.prototype.register = function (ext, fn, options) {
   }
 
   engine.options = fn.options || options || {};
-  engine.helpers = new Helpers();
+  engine.helpers = new Helpers(options);
 
   if (typeof engine.render !== 'function') {
     throw new Error('Engines are expected to have a `render` method.');
