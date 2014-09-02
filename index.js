@@ -132,7 +132,10 @@ Engines.prototype.wrapEngine = function(engine) {
     var opts = extend({}, options);
 
     opts.helpers = extend({}, engine.helpers, opts.helpers);
-    return render.call(this, str, opts, callback);
+    return render.call(this, str, opts, function (err, content) {
+      if (err) return callback(err);
+      return engine.helpers.resolve(content, callback);
+    });
   };
 };
 
