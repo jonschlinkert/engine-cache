@@ -15,7 +15,7 @@ var _engines = require('engines');
 
 describe('engines defaults', function () {
   before(function () {
-    engines.init();
+    engines = new Engines();
   });
 
   describe('.get()', function () {

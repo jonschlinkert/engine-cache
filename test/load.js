@@ -14,6 +14,13 @@ var engines = new Engines();
 describe('engines load', function() {
   beforeEach(function() {
     engines.clear();
+
+    /**
+     * Load engine objects from `engines` in node_modules.
+     * Engines must be installed individually, just like
+     * consolidate.
+     */
+
     engines.load(require('engines'));
   });
 
