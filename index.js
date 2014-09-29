@@ -172,7 +172,7 @@ Engines.prototype.load = function(obj) {
   debug('[load]', arguments);
 
   forOwn(obj, function (value, key) {
-    if (hasOwn(value, 'render')) {
+    if (hasOwn(value, 'render') || hasOwn(value, 'renderSync')) {
       this.register(key, value);
     }
   }.bind(this));
