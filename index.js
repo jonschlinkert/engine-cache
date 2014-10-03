@@ -86,7 +86,7 @@ Engines.prototype.register = function (ext, fn, options) {
     engine.renderFile = fn.renderFile || fn.__express;
   }
 
-  engine.options = fn.options || options || {};
+  engine.options = engine.options || fn.options || options || {};
   engine.helpers = new Helpers(options);
 
   if (typeof engine.render !== 'function') {
