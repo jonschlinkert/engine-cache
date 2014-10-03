@@ -11,11 +11,11 @@ var should = require('should');
 var Engines = require('..');
 var engines = new Engines();
 var consolidate = require('consolidate');
-var _engines = require('engines');
+
 
 describe('engines defaults', function () {
   before(function () {
-    engines.init();
+    engines = new Engines();
   });
 
   describe('.get()', function () {
@@ -29,14 +29,6 @@ describe('engines defaults', function () {
         content.should.equal('Jon Schlinkert');
         done();
       });
-    });
-
-    it('should render content with handlebars.', function() {
-      engines.register('hbs', _engines.handlebars);
-      var hbs = engines.get('hbs');
-
-      var content = hbs.render('{{name}}', {name: 'Jon Schlinkert'});
-      content.should.equal('Jon Schlinkert');
     });
   });
 });

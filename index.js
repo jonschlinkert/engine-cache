@@ -1,10 +1,22 @@
+/*!
+ * engine-cache <https://github.com/jonschlinkert/engine-cache>
+ *
+ * Copyright (c) 2014 Jon Schlinkert, Brian Woodward, contributors.
+ * Licensed under the MIT license.
+ */
+
 'use strict';
 
+/**
+ * Module dependencies
+ */
 
 var debug = require('debug')('engine-cache');
 var Helpers = require('helper-cache');
-var _ = require('lodash');
-var extend = _.extend;
+var merge = require('mixin-deep');
+var forOwn = require('for-own');
+var typeOf = require('kind-of');
+var hasAny = require('has-any');
 
 
 /**
@@ -13,7 +25,7 @@ var extend = _.extend;
  * var engines = new Engines();
  * ```
  *
- * @param {Object} `options` Default options to use.
+ * @param {Object} `engines` Default `engines` object to use for initialization.
  * @api public
  */
 
@@ -66,31 +78,30 @@ Engines.prototype.register = function (ext, fn, options) {
   var args = [].slice.call(arguments).filter(Boolean);
 
   debug('[register]', arguments);
-  var engine = {};
 
   if (args.length === 3) {
-    if (options && (typeof options === 'function' ||
-        options.hasOwnProperty('render') ||
-        options.hasOwnProperty('renderFile'))) {
+    if (options && (typeof options === 'function' || hasAny(options, ['render', 'renderFile']))) {
       var opts = fn;
       fn = options;
       options = opts;
     }
   }
 
+  var engine = {};
+
   if (typeof fn === 'function') {
     engine = fn;
-    engine.render = fn.render;
-  } else if (typeof fn === 'object') {
-    engine = fn || this.noop;
+  } else if (isObject(fn)) {
+    engine = fn;
+    engine.renderSync = fn.renderSync;
     engine.renderFile = fn.renderFile || fn.__express;
   }
 
-  engine.options = fn.options || options || {};
-  engine.helpers = new Helpers();
+  engine.options = engine.options || fn.options || options || {};
+  engine.helpers = new Helpers(options);
 
-  if (typeof engine.render !== 'function') {
-    throw new Error('Engines are expected to have a `render` method.');
+  if (typeof engine.render !== 'function' && typeof engine.renderSync !== 'function') {
+    throw new Error('Engines are expected to have a `render` or `renderSync` method.');
   }
 
   this.wrapEngine(engine);
@@ -124,16 +135,19 @@ Engines.prototype.wrapEngine = function(engine) {
   var render = engine.render;
 
   engine.render = function(str, options, callback) {
-    if (typeof options === 'function') {
+    if (isFunction(options)) {
       callback = options;
       options = {};
     }
 
-    var opts = extend({}, options);
+    var opts = merge({}, options);
+    opts.helpers = merge({}, engine.helpers, opts.helpers);
 
-    opts.helpers = extend({}, engine.helpers, opts.helpers);
     return render.call(this, str, opts, function (err, content) {
-      if (err) return callback(err);
+      if (err) {
+        callback(err);
+        return;
+      }
       return engine.helpers.resolve(content, callback);
     });
   };
@@ -157,11 +171,11 @@ Engines.prototype.wrapEngine = function(engine) {
 Engines.prototype.load = function(obj) {
   debug('[load]', arguments);
 
-  _.forIn(obj, function (value, key) {
-    if (value.hasOwnProperty('render')) {
+  forOwn(obj, function (value, key) {
+    if (hasOwn(value, 'render') || hasOwn(value, 'renderSync')) {
       this.register(key, value);
     }
-  }, this);
+  }.bind(this));
 
   return this;
 };
@@ -251,10 +265,36 @@ Engines.prototype.clear = function(ext) {
   }
 };
 
+
 /**
- * Export `Engines`
+ * Utilities for returning the native `typeof` a value.
  *
- * @type {Object}
+ * @api private
+ */
+
+function isFunction(value) {
+  return typeOf(value) === 'function';
+}
+
+function isObject(value) {
+  return typeOf(value) === 'object';
+}
+
+function isArray(value) {
+  return Array.isArray(value);
+}
+
+function isString(value) {
+  return typeOf(value) === 'string';
+}
+
+function hasOwn(o, prop) {
+  return {}.hasOwnProperty.call(o, prop);
+}
+
+
+/**
+ * Expose `Engines`
  */
 
 module.exports = Engines;

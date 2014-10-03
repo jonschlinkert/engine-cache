@@ -111,7 +111,11 @@
   "dependencies": {
     "debug": "^1.0.4",
     "engine-noop": "^0.1.0",
+    "for-own": "^0.1.1",
+    "has-any": "^0.1.0",
     "helper-cache": "^0.2.0",
-    "lodash": "^2.4.1"
+    "kind-of": "^0.1.0",
+    "lodash": "^2.4.1",
+    "mixin-deep": "^0.1.0"
   }
 }
