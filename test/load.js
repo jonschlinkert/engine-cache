@@ -13,7 +13,7 @@ var engines = new Engines();
 
 describe('engines load', function() {
   beforeEach(function() {
-    engines.clear();
+    // engines.clear();
 
     /**
      * Load engine objects from `engines` in node_modules.
@@ -21,21 +21,40 @@ describe('engines load', function() {
      * consolidate.
      */
 
-    // engines.load(require('consolidate'));
     engines.load(require('engines'));
   });
 
   var ctx = {name: 'Jon Schlinkert'};
 
-  describe('.load()', function() {
+  describe('.load() render', function() {
     it('should load the cache with engines.', function() {
       engines.get('lodash').should.have.property('render');
-      engines.get('lodash').should.have.property('renderSync');
       engines.get('underscore').should.have.property('render');
-      engines.get('underscore').should.have.property('renderSync');
       engines.get('handlebars').should.have.property('render');
-      engines.get('handlebars').should.have.property('renderSync');
       engines.get('swig').should.have.property('render');
+    });
+
+    it('should render content with a loaded engine: lodash.', function() {
+      var lodash = engines.get('.lodash');
+      lodash.renderSync('<%= name %>', ctx).should.equal('Jon Schlinkert');
+    });
+
+    it('should render content with a loaded engine: handlebars.', function() {
+      var hbs = engines.get('handlebars');
+      hbs.renderSync('{{ name }}', ctx).should.equal('Jon Schlinkert');
+    });
+
+    it('should render content with a loaded engine: swig.', function() {
+      var hbs = engines.get('swig');
+      hbs.renderSync('{{ name }}', ctx).should.equal('Jon Schlinkert');
+    });
+  });
+
+  describe('.load() renderSync', function() {
+    it('should load the cache with engines.', function() {
+      engines.get('lodash').should.have.property('renderSync');
+      engines.get('underscore').should.have.property('renderSync');
+      engines.get('handlebars').should.have.property('renderSync');
       engines.get('swig').should.have.property('renderSync');
     });
 

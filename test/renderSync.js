@@ -12,7 +12,7 @@ var Engines = require('..');
 var engines = new Engines();
 
 
-describe('engines defaults', function () {
+describe('.renderSync()', function () {
   before(function () {
     engines.init();
     engines.load(require('engines'));
