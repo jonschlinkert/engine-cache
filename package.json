@@ -1,7 +1,7 @@
 {
   "name": "engine-cache",
   "description": "express.js inspired template-engine manager.",
-  "version": "0.3.3",
+  "version": "0.3.4",
   "homepage": "https://github.com/jonschlinkert/engine-cache",
   "author": {
     "name": "Jon Schlinkert",

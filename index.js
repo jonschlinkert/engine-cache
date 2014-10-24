@@ -79,7 +79,6 @@ Engines.prototype.register = function (ext, fn, options) {
   }
 
   if (typeof fn === 'function') {
-    engine = fn;
     engine.render = fn.render;
     if (fn.renderSync) {
       engine.renderSync = fn.renderSync;
@@ -94,6 +93,12 @@ Engines.prototype.register = function (ext, fn, options) {
 
   if (typeof engine.render !== 'function' && typeof engine.renderSync !== 'function') {
     throw new Error('Engines are expected to have a `render` or `renderSync` method.');
+  }
+
+  if (engine.render) {
+    engine.name = engine.render.name || 'unknown';
+  } else {
+    engine.name = engine.renderSync.name || 'unknown';
   }
 
   this.decorate(engine);
