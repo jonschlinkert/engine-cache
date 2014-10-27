@@ -34,7 +34,7 @@ function Engines(engines) {
 
 Engines.prototype.init = function(engines) {
   debug('init', arguments);
-  this.engines = engines || {};
+  this.cache = engines || {};
   this.defaultEngines();
 };
 
@@ -111,7 +111,7 @@ Engines.prototype.setEngine = function (ext, fn, options) {
   }
 
   debug('[set] %s: %j', ext, engine);
-  this.engines[ext] = engine;
+  this.cache[ext] = engine;
   return this;
 };
 
@@ -134,7 +134,7 @@ Engines.prototype.setEngine = function (ext, fn, options) {
 
 Engines.prototype.getEngine = function(ext) {
   if (!ext) {
-    return this.engines;
+    return this.cache;
   }
 
 
@@ -142,9 +142,9 @@ Engines.prototype.getEngine = function(ext) {
     ext = '.' + ext;
   }
 
-  var engine = this.engines[ext];
+  var engine = this.cache[ext];
   if (!engine) {
-    engine = this.engines['.*'];
+    engine = this.cache['.*'];
   }
   return engine;
 };
@@ -263,8 +263,8 @@ Engines.prototype.clear = function(ext) {
     if (ext[0] !== '.') {
       ext = '.' + ext;
     }
-    delete this.engines[ext];
+    delete this.cache[ext];
   } else {
-    this.engines = {};
+    this.cache = {};
   }
 };

@@ -24,7 +24,7 @@ describe('engines setEngine', function() {
       engines.setEngine('c', {render: function () {} });
       engines.setEngine('d', {render: function () {} });
 
-      engines.engines.should.have.properties('.a', '.b', '.c', '.d');
+      engines.cache.should.have.properties('.a', '.b', '.c', '.d');
     });
 
     it('should normalize engine extensions to have a dot.', function() {
@@ -33,7 +33,7 @@ describe('engines setEngine', function() {
       engines.setEngine('c', {render: function () {} });
       engines.setEngine('d', {render: function () {} });
 
-      engines.engines.should.have.properties('.a', '.b', '.c', '.d');
+      engines.cache.should.have.properties('.a', '.b', '.c', '.d');
     });
 
     it('should be chainable.', function() {
@@ -43,7 +43,7 @@ describe('engines setEngine', function() {
         .setEngine('c', {render: function () {} })
         .setEngine('d', {render: function () {} });
 
-      engines.engines.should.have.properties('.a', '.b', '.c', '.d');
+      engines.cache.should.have.properties('.a', '.b', '.c', '.d');
     });
 
     it('should allow options to be passed as the last argument.', function() {
