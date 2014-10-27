@@ -17,19 +17,19 @@ describe('engines', function() {
     engines.clear();
   });
 
-  describe('.get()', function() {
+  describe('.getEngine()', function() {
     it('should cache the lodash engine.', function() {
       var ctx = {name: 'Jon Schlinkert'};
-      engines.register('tmpl', lodash);
-      engines.get('tmpl').should.have.property('render');
+      engines.setEngine('tmpl', lodash);
+      engines.getEngine('tmpl').should.have.property('render');
     });
 
     it('should render content with a loaded engine: lodash.', function(done) {
       var lodash = require('engine-lodash');
       var ctx = {name: 'Jon Schlinkert'};
-      engines.register('tmpl', lodash);
+      engines.setEngine('tmpl', lodash);
 
-      var lodash = engines.get('tmpl');
+      var lodash = engines.getEngine('tmpl');
       lodash.render('<%= name %>', ctx, function (err, content) {
         content.should.equal('Jon Schlinkert');
         done();

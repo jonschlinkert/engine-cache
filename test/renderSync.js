@@ -18,39 +18,37 @@ describe('.renderSync()', function () {
     engines.load(require('engines'));
   });
 
-
-  describe('.get()', function () {
-    it('should render content with handlebars.', function() {
-      engines.register('hbs', require('engines').handlebars);
-      var hbs = engines.get('hbs');
+  describe('.getEngine()', function () {
+    it('should render content using a cached engine: [handlebars].', function() {
+      engines.setEngine('hbs', require('engines').handlebars);
+      var hbs = engines.getEngine('hbs');
       var content = hbs.renderSync('a{{letter}}c', {letter: 'b'});
       content.should.equal('abc');
     });
   });
 
-
   describe('.load()', function() {
     var ctx = {letter: 'b'};
 
     it('should load the cache with engines.', function() {
-      engines.get('lodash').should.have.property('renderSync');
-      engines.get('underscore').should.have.property('renderSync');
-      engines.get('handlebars').should.have.property('renderSync');
-      engines.get('swig').should.have.property('renderSync');
+      engines.getEngine('lodash').should.have.property('renderSync');
+      engines.getEngine('underscore').should.have.property('renderSync');
+      engines.getEngine('handlebars').should.have.property('renderSync');
+      engines.getEngine('swig').should.have.property('renderSync');
     });
 
     it('should render content with a loaded engine: lodash.', function() {
-      var lodash = engines.get('lodash');
+      var lodash = engines.getEngine('lodash');
       lodash.renderSync('a<%= letter %>c', ctx).should.equal('abc');
     });
 
     it('should render content with a loaded engine: handlebars.', function() {
-      var hbs = engines.get('handlebars');
+      var hbs = engines.getEngine('handlebars');
       hbs.renderSync('a{{ letter }}c', ctx).should.equal('abc');
     });
 
     it('should render content with a loaded engine: swig.', function() {
-      var hbs = engines.get('swig');
+      var hbs = engines.getEngine('swig');
       hbs.renderSync('a{{ letter }}c', ctx).should.equal('abc');
     });
   });

@@ -13,16 +13,15 @@ var engines = new Engines();
 var consolidate = require('consolidate');
 
 
-describe('engines defaults', function () {
+describe('engines render', function () {
   before(function () {
     engines = new Engines();
   });
 
-  describe('.get()', function () {
-
-    it('should render content with handlebars.', function(done) {
-      engines.register('hbs', consolidate.handlebars);
-      var hbs = engines.get('hbs');
+  describe('.render()', function () {
+    it('should render content with a cached engine: [handlebars].', function(done) {
+      engines.setEngine('hbs', consolidate.handlebars);
+      var hbs = engines.getEngine('hbs');
 
       hbs.render('{{name}}', {name: 'Jon Schlinkert'}, function (err, content) {
         if (err) console.log(err);

@@ -12,20 +12,19 @@ var Engines = require('..');
 var engines = new Engines();
 var consolidate = require('consolidate');
 
-
 describe('async helpers', function () {
   before(function () {
     engines = new Engines();
   });
 
   it('should render content with handlebars.', function(done) {
-    engines.register('hbs', consolidate.handlebars);
+    engines.setEngine('hbs', consolidate.handlebars);
     var helpers = engines.helpers('hbs');
     helpers.addHelperAsync('upper', function (str, options, callback) {
       callback(null, str.toUpperCase());
     });
 
-    var hbs = engines.get('hbs');
+    var hbs = engines.getEngine('hbs');
     hbs.render('{{upper name}}', {name: 'Jon Schlinkert'}, function (err, content) {
       if (err) console.log(err);
       content.should.equal('JON SCHLINKERT');
@@ -34,13 +33,13 @@ describe('async helpers', function () {
   });
 
   it('should render content with handlebars.', function(done) {
-    engines.register('hbs', consolidate.handlebars);
+    engines.setEngine('hbs', consolidate.handlebars);
     var helpers = engines.helpers('hbs');
     helpers.addHelperAsync('upper', function (str, options, callback) {
       callback(null, str.toUpperCase());
     });
 
-    var hbs = engines.get('hbs');
+    var hbs = engines.getEngine('hbs');
     var ctx = {jon: 'Jon Schlinkert', brian: 'Brian Woodward'};
 
     hbs.render('Jon: {{upper jon}}\nBrian: {{upper brian}}', ctx, function (err, content) {

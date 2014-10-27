@@ -27,49 +27,49 @@ describe('engines load', function() {
   var ctx = {name: 'Jon Schlinkert'};
 
   describe('.load() render', function() {
-    it('should load the cache with engines.', function() {
-      engines.get('lodash').should.have.property('render');
-      engines.get('underscore').should.have.property('render');
-      engines.get('handlebars').should.have.property('render');
-      engines.get('swig').should.have.property('render');
+    it('should load an object of engines onto the `cache`:', function() {
+      engines.getEngine('lodash').should.have.property('render');
+      engines.getEngine('underscore').should.have.property('render');
+      engines.getEngine('handlebars').should.have.property('render');
+      engines.getEngine('swig').should.have.property('render');
     });
 
-    it('should render content with a loaded engine: lodash.', function() {
-      var lodash = engines.get('.lodash');
+    it('should render content with a loaded engine: [lodash].', function() {
+      var lodash = engines.getEngine('.lodash');
       lodash.renderSync('<%= name %>', ctx).should.equal('Jon Schlinkert');
     });
 
-    it('should render content with a loaded engine: handlebars.', function() {
-      var hbs = engines.get('handlebars');
+    it('should render content with a loaded engine: [handlebars].', function() {
+      var hbs = engines.getEngine('handlebars');
       hbs.renderSync('{{ name }}', ctx).should.equal('Jon Schlinkert');
     });
 
-    it('should render content with a loaded engine: swig.', function() {
-      var hbs = engines.get('swig');
+    it('should render content with a loaded engine: [swig].', function() {
+      var hbs = engines.getEngine('swig');
       hbs.renderSync('{{ name }}', ctx).should.equal('Jon Schlinkert');
     });
   });
 
   describe('.load() renderSync', function() {
-    it('should load the cache with engines.', function() {
-      engines.get('lodash').should.have.property('renderSync');
-      engines.get('underscore').should.have.property('renderSync');
-      engines.get('handlebars').should.have.property('renderSync');
-      engines.get('swig').should.have.property('renderSync');
+    it('should load an object of engines onto the `cache`:', function() {
+      engines.getEngine('lodash').should.have.property('renderSync');
+      engines.getEngine('underscore').should.have.property('renderSync');
+      engines.getEngine('handlebars').should.have.property('renderSync');
+      engines.getEngine('swig').should.have.property('renderSync');
     });
 
     it('should render content with a loaded engine: lodash.', function() {
-      var lodash = engines.get('lodash');
+      var lodash = engines.getEngine('lodash');
       lodash.renderSync('<%= name %>', ctx).should.equal('Jon Schlinkert');
     });
 
     it('should render content with a loaded engine: handlebars.', function() {
-      var hbs = engines.get('handlebars');
+      var hbs = engines.getEngine('handlebars');
       hbs.renderSync('{{ name }}', ctx).should.equal('Jon Schlinkert');
     });
 
     it('should render content with a loaded engine: swig.', function() {
-      var hbs = engines.get('swig');
+      var hbs = engines.getEngine('swig');
       hbs.renderSync('{{ name }}', ctx).should.equal('Jon Schlinkert');
     });
   });

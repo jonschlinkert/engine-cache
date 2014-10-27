@@ -19,7 +19,6 @@ describe('engines init', function() {
   describe('.defaults()', function() {
     it('should set defaults on the `options` object.', function() {
       engines.init();
-
       engines.engines['.*'].should.be.an.object;
     });
   });

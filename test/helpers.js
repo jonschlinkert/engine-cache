@@ -13,16 +13,14 @@ var Engines = require('..');
 var engines = new Engines();
 
 
-describe('engines register', function() {
+describe('engines helpers', function() {
   beforeEach(function() {
     engines.init();
   });
 
   describe('.helpers()', function() {
     it('should add a helper to the `cache` for the given engine.', function() {
-      engines.register('a', {
-        render: function () {}
-      });
+      engines.setEngine('a', {render: function () {}});
 
       var helpers = engines.helpers('a');
       helpers.addHelper('foo', function() {});
@@ -30,9 +28,7 @@ describe('engines register', function() {
     });
 
     it('should get the helpers for the given engine.', function() {
-      engines.register('a', {
-        render: function () {}
-      });
+      engines.setEngine('a', {render: function () {}});
 
       var helpers = engines.helpers('a');
       helpers.addHelper('foo', function() {});

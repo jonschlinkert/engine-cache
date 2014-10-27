@@ -7,19 +7,24 @@ var extend = require('mixin-deep');
 var forOwn = require('for-own');
 
 /**
+ * Expose `Engines`
+ */
+
+module.exports = Engines;
+
+/**
  * ```js
  * var Engines = require('engine-cache');
  * var engines = new Engines();
  * ```
  *
- * @param {Object} `options` Default options to use.
+ * @param {Object} `engines` Optionally pass an object of engines to initialize with.
  * @api public
  */
 
-function Engines (engines) {
+function Engines(engines) {
   this.init(engines);
 }
-
 
 /**
  * Initialize default configuration.
@@ -33,7 +38,6 @@ Engines.prototype.init = function(engines) {
   this.defaultEngines();
 };
 
-
 /**
  * Load default engines
  *
@@ -42,16 +46,15 @@ Engines.prototype.init = function(engines) {
 
 Engines.prototype.defaultEngines = function() {
   debug('defaultEngines', arguments);
-  this.register('*', require('engine-noop'));
+  this.setEngine('*', require('engine-noop'));
 };
-
 
 /**
  * Register the given view engine callback `fn` as `ext`.
  *
  * ```js
  * var consolidate = require('consolidate')
- * engines.register('hbs', consolidate.handlebars)
+ * engines.setEngine('hbs', consolidate.handlebars)
  * ```
  *
  * @param {String} `ext`
@@ -61,10 +64,10 @@ Engines.prototype.defaultEngines = function() {
  * @api public
  */
 
-Engines.prototype.register = function (ext, fn, options) {
+Engines.prototype.setEngine = function (ext, fn, options) {
   var args = [].slice.call(arguments).filter(Boolean);
 
-  debug('[register]', arguments);
+  debug('[set]', arguments);
   var engine = {};
 
   if (args.length === 3) {
@@ -107,12 +110,44 @@ Engines.prototype.register = function (ext, fn, options) {
     ext = '.' + ext;
   }
 
-  debug('[registered] %s: %j', ext, engine);
+  debug('[set] %s: %j', ext, engine);
   this.engines[ext] = engine;
-
   return this;
 };
 
+/**
+ * Return the engine stored by `ext`. If no `ext`
+ * is passed, the entire cache is returned.
+ *
+ * ```js
+ * var consolidate = require('consolidate')
+ * engine.setEngine('hbs', consolidate.handlebars);
+ *
+ * engine.getEngine('hbs');
+ * // => {render: [function], renderFile: [function]}
+ * ```
+ *
+ * @param {String} `ext` The engine to get.
+ * @return {Object} The specified engine.
+ * @api public
+ */
+
+Engines.prototype.getEngine = function(ext) {
+  if (!ext) {
+    return this.engines;
+  }
+
+
+  if (ext[0] !== '.') {
+    ext = '.' + ext;
+  }
+
+  var engine = this.engines[ext];
+  if (!engine) {
+    engine = this.engines['.*'];
+  }
+  return engine;
+};
 
 /**
  * Wrap engines to extend the helpers object and other
@@ -151,11 +186,9 @@ Engines.prototype.decorate = function(engine) {
   engine.renderSync = function(str, options) {
     var opts = options || {};
     opts.helpers = extend({}, engine.helpers, opts.helpers);
-
     return renderSync(str, opts);
   };
 };
-
 
 /**
  * Load an object of engines onto the `cache`.
@@ -181,46 +214,11 @@ Engines.prototype.load = function(obj) {
     var name = engines[i];
     var engine = obj[name];
     if (name !== 'clearCache') {
-      this.register(name, engine);
+      this.setEngine(name, engine);
     }
   }
   return this;
 };
-
-
-/**
- * Return the engine stored by `ext`. If no `ext`
- * is passed, the entire cache is returned.
- *
- * ```js
- * var consolidate = require('consolidate')
- * engine.set('hbs', consolidate.handlebars)
- * engine.get('hbs')
- * // => {render: [function], renderFile: [function]}
- * ```
- *
- * @param {String} `ext` The engine to get.
- * @return {Object} The specified engine.
- * @api public
- */
-
-Engines.prototype.get = function(ext) {
-  if (!ext) {
-    return this.engines;
-  }
-
-
-  if (ext[0] !== '.') {
-    ext = '.' + ext;
-  }
-
-  var engine = this.engines[ext];
-  if (!engine) {
-    engine = this.engines['.*'];
-  }
-  return engine;
-};
-
 
 /**
  * Get and set helpers for the given `ext` (engine). If no
@@ -243,9 +241,8 @@ Engines.prototype.get = function(ext) {
  */
 
 Engines.prototype.helpers = function (ext) {
-  return this.get(ext).helpers;
+  return this.getEngine(ext).helpers;
 };
-
 
 /**
  * Remove `ext` engine from the cache, or if no value is
@@ -271,11 +268,3 @@ Engines.prototype.clear = function(ext) {
     this.engines = {};
   }
 };
-
-/**
- * Export `Engines`
- *
- * @type {Object}
- */
-
-module.exports = Engines;

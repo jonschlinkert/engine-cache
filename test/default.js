@@ -9,32 +9,27 @@
 
 var should = require('should');
 var Engines = require('..');
-var engines = new Engines();
+var engines;
 
 
 describe('engines defaults', function () {
-  before(function () {
-    engines.init();
+  beforeEach(function () {
+    engines = new Engines();
   });
 
-  describe('.get()', function () {
+  describe('.getEngine()', function () {
     it('should get the default engine.', function () {
-      engines.get('*').should.have.property('render');
+      engines.getEngine('*').should.have.property('render');
     });
 
-
     it('should render content with the default noop engine.', function () {
-      var noop = engines.get('*');
-
-      noop.render('<%= a %>', function(err, content) {
+      engines.getEngine('*').render('<%= a %>', function(err, content) {
         content.should.equal('<%= a %>');
       });
     });
 
     it('should synchronously render content with the default noop engine.', function () {
-      var noop = engines.get('*');
-      noop.renderSync('foo').should.equal('foo');
+      engines.getEngine('*').renderSync('foo').should.equal('foo');
     });
-
   });
 });
