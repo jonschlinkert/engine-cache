@@ -82,7 +82,7 @@ Engines.prototype.setEngine = function (ext, fn, options) {
   }
 
   if (typeof fn === 'function') {
-    engine.render = fn.render;
+    engine.render = fn.render || fn;
     if (fn.renderSync) {
       engine.renderSync = fn.renderSync;
     }
