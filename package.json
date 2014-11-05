@@ -72,6 +72,7 @@
     "engine-lodash": "^0.2.0",
     "engines": "^0.4.0",
     "handlebars": "^2.0.0-beta.1",
+    "lodash": "^2.4.1",
     "mocha": "*",
     "should": "^4.0.4",
     "swig": "^1.4.2",
@@ -82,7 +83,7 @@
     "debug": "^1.0.4",
     "engine-noop": "^0.1.0",
     "for-own": "^0.1.2",
-    "helper-cache": "^0.2.3",
+    "helper-cache": "^0.4.0",
     "mixin-deep": "^0.1.0"
   }
 }

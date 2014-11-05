@@ -20,7 +20,7 @@ describe('async helpers', function () {
   it('should render content with handlebars.', function(done) {
     engines.setEngine('hbs', consolidate.handlebars);
     var helpers = engines.helpers('hbs');
-    helpers.addHelperAsync('upper', function (str, options, callback) {
+    helpers.addAsyncHelper('upper', function (str, options, callback) {
       callback(null, str.toUpperCase());
     });
 
@@ -35,7 +35,7 @@ describe('async helpers', function () {
   it('should render content with handlebars.', function(done) {
     engines.setEngine('hbs', consolidate.handlebars);
     var helpers = engines.helpers('hbs');
-    helpers.addHelperAsync('upper', function (str, options, callback) {
+    helpers.addAsyncHelper('upper', function (str, options, callback) {
       callback(null, str.toUpperCase());
     });
 
