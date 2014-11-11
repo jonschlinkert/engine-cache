@@ -10,34 +10,30 @@
 var assert = require('assert');
 var should = require('should');
 var Engines = require('..');
-var engines = new Engines();
+var engines;
 
 
 describe('engines helpers', function() {
   beforeEach(function() {
-    engines.init();
+    engines = new Engines();
+    engines.setEngine('abc', {render: function () {}});
   });
 
   describe('.helpers()', function() {
     it('should add a helper to the `cache` for the given engine.', function() {
-      engines.setEngine('a', {render: function () {}});
-
-      var helpers = engines.helpers('a');
+      var helpers = engines.helpers('abc');
       helpers.addHelper('foo', function() {});
       helpers.getHelper('foo').should.be.a.function;
     });
 
     it('should get the helpers for the given engine.', function() {
-      engines.setEngine('a', {render: function () {}});
-
-      var helpers = engines.helpers('a');
+      var helpers = engines.helpers('abc');
       helpers.addHelper('foo', function() {});
       helpers.getHelper().should.be.an.object;
     });
 
     it('should get the helpers for the given engine.', function() {
-      var helpers = engines.helpers('a');
-
+      var helpers = engines.helpers('abc');
       assert.equal(typeof helpers, 'object');
     });
   });

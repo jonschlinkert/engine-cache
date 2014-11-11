@@ -3,7 +3,8 @@
 
 var debug = require('debug')('engine-cache');
 var Helpers = require('helper-cache');
-var extend = require('mixin-deep');
+var slice = require('array-slice');
+var extend = require('extend-shallow');
 var forOwn = require('for-own');
 
 /**
@@ -35,18 +36,6 @@ function Engines(engines) {
 Engines.prototype.init = function(engines) {
   debug('init', arguments);
   this.cache = engines || {};
-  this.defaultEngines();
-};
-
-/**
- * Load default engines
- *
- * @api private
- */
-
-Engines.prototype.defaultEngines = function() {
-  debug('defaultEngines', arguments);
-  this.setEngine('*', require('engine-noop'));
 };
 
 /**
@@ -65,7 +54,7 @@ Engines.prototype.defaultEngines = function() {
  */
 
 Engines.prototype.setEngine = function (ext, fn, options) {
-  var args = [].slice.call(arguments).filter(Boolean);
+  var args = slice(arguments);
 
   debug('[set]', arguments);
   var engine = {};
@@ -137,7 +126,6 @@ Engines.prototype.getEngine = function(ext) {
     return this.cache;
   }
 
-
   if (ext[0] !== '.') {
     ext = '.' + ext;
   }
@@ -146,6 +134,7 @@ Engines.prototype.getEngine = function(ext) {
   if (!engine) {
     engine = this.cache['.*'];
   }
+
   return engine;
 };
 
@@ -209,9 +198,10 @@ Engines.prototype.load = function(obj) {
 
   var engines = Object.keys(obj);
   var len = engines.length;
+  var i = 0;
 
-  for (var i = 0; i < len; i++) {
-    var name = engines[i];
+  while (i < len) {
+    var name = engines[i++];
     var engine = obj[name];
     if (name !== 'clearCache') {
       this.setEngine(name, engine);

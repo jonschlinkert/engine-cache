@@ -9,17 +9,16 @@
 
 var should = require('should');
 var Engines = require('..');
-var engines = new Engines();
+var engines;
 
 describe('engines init', function() {
   beforeEach(function() {
-    engines.clear();
+    engines = new Engines();
   });
 
-  describe('.defaults()', function() {
-    it('should set defaults on the `options` object.', function() {
-      engines.init();
-      engines.cache['.*'].should.be.an.object;
-    });
+  it('engines.cache should be an empty object.', function() {
+    engines.init();
+    engines.cache.should.be.an.object;
+    Object.keys(engines.cache).length.should.equal(0);
   });
 });

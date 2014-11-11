@@ -10,11 +10,11 @@
 var assert = require('assert');
 var should = require('should');
 var Engines = require('..');
-var engines = new Engines();
+var engines;
 
 describe('engines setEngine', function() {
   beforeEach(function() {
-    engines.clear();
+    engines = new Engines();
   });
 
   describe('.setEngine()', function() {
