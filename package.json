@@ -70,14 +70,14 @@
   "devDependencies": {
     "consolidate": "^0.10.0",
     "engine-lodash": "^0.2.0",
+    "engine-handlebars": "^0.4.0",
     "engine-noop": "^0.1.0",
     "engines": "^0.4.0",
     "handlebars": "^2.0.0-beta.1",
     "lodash": "^2.4.1",
     "mocha": "*",
     "should": "^4.3.0",
-    "swig": "^1.4.2",
-    "verb": "^0.3.0"
+    "swig": "^1.4.2"
   },
   "dependencies": {
     "array-slice": "^0.2.2",

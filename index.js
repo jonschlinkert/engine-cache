@@ -79,7 +79,7 @@ Engines.prototype.setEngine = function (ext, fn, options) {
     engine = fn || this.noop;
     engine.renderFile = fn.renderFile || fn.__express;
   }
-
+  engine.compile = engine.compile || fn.compile;
   engine.options = engine.options || fn.options || options || {};
   engine.helpers = new Helpers(options);
 
@@ -156,27 +156,52 @@ Engines.prototype.decorate = function(engine) {
 
   var renderSync = engine.renderSync;
   var render = engine.render;
+  var compile = engine.compile || function (str, settings) {
+    return str;
+  };
 
-  engine.render = function(str, options, callback) {
-    if (typeof options === 'function') {
-      callback = options;
-      options = {};
+  engine.render = function(str, context, callback) {
+    if (typeof context === 'function') {
+      callback = context;
+      context = {};
     }
 
-    var opts = options || {};
-    opts.helpers = extend({}, engine.helpers, opts.helpers);
+    if (typeof str !== 'function') {
+      str = this.compile(str, context);
+    }
+    if (typeof str === 'function') {
+      return engine.helpers.resolve(str(context), callback);
+    }
 
+    var opts = context || {};
+    opts.helpers = extend({}, engine.helpers, context.helpers);
     return render.call(this, str, opts, function (err, content) {
       if (err) return callback(err);
       return engine.helpers.resolve(content, callback);
     });
   };
 
-  engine.renderSync = function(str, options) {
-    var opts = options || {};
+  engine.renderSync = function(str, context) {
+    if (typeof str !== 'function') {
+      str = this.compile(str, context);
+    }
+    if (typeof str === 'function') {
+      return str(context);
+    }
+
+    var opts = context || {};
     opts.helpers = extend({}, engine.helpers, opts.helpers);
     return renderSync(str, opts);
   };
+
+  engine.compile = function (str, settings) {
+    if (typeof str === 'function') {
+      return str;
+    }
+    settings = settings || {};
+    settings.helpers = extend({}, engine.helpers, settings.helpers);
+    return compile(str, settings);
+  }
 };
 
 /**
