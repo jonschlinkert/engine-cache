@@ -156,51 +156,51 @@ Engines.prototype.decorate = function(engine) {
 
   var renderSync = engine.renderSync;
   var render = engine.render;
-  var compile = engine.compile || function (str, settings) {
+  var compile = engine.compile || function (str, options) {
     return str;
   };
 
-  engine.render = function(str, context, callback) {
-    if (typeof context === 'function') {
-      callback = context;
-      context = {};
+  engine.render = function(str, options, callback) {
+    if (typeof options === 'function') {
+      callback = options;
+      options = {};
     }
 
     if (typeof str !== 'function') {
-      str = this.compile(str, context);
+      str = this.compile(str, options);
     }
     if (typeof str === 'function') {
-      return engine.helpers.resolve(str(context), callback);
+      return engine.helpers.resolve(str(options), callback);
     }
 
-    var opts = context || {};
-    opts.helpers = extend({}, engine.helpers, context.helpers);
+    var opts = options || {};
+    opts.helpers = extend({}, engine.helpers, opts.helpers);
     return render.call(this, str, opts, function (err, content) {
       if (err) return callback(err);
       return engine.helpers.resolve(content, callback);
     });
   };
 
-  engine.renderSync = function(str, context) {
+  engine.renderSync = function(str, options) {
     if (typeof str !== 'function') {
-      str = this.compile(str, context);
+      str = this.compile(str, options);
     }
     if (typeof str === 'function') {
-      return str(context);
+      return str(options);
     }
 
-    var opts = context || {};
+    var opts = options || {};
     opts.helpers = extend({}, engine.helpers, opts.helpers);
     return renderSync(str, opts);
   };
 
-  engine.compile = function (str, settings) {
+  engine.compile = function (str, options) {
     if (typeof str === 'function') {
       return str;
     }
-    settings = settings || {};
-    settings.helpers = extend({}, engine.helpers, settings.helpers);
-    return compile(str, settings);
+    var opts = options || {};
+    opts.helpers = extend({}, engine.helpers, opts.helpers);
+    return compile(str, opts);
   }
 };
 
