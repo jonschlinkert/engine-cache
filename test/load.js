@@ -9,11 +9,12 @@
 
 var should = require('should');
 var Engines = require('..');
-var engines = new Engines();
+var engines;
 
 describe('engines load', function() {
+  /* deps: swig, engine-lodash, handlebars */
   beforeEach(function() {
-    // engines.clear();
+    engines = new Engines();
 
     /**
      * Load engine objects from `engines` in node_modules.
@@ -29,7 +30,6 @@ describe('engines load', function() {
   describe('.load() render', function() {
     it('should load an object of engines onto the `cache`:', function() {
       engines.getEngine('lodash').should.have.property('render');
-      engines.getEngine('underscore').should.have.property('render');
       engines.getEngine('handlebars').should.have.property('render');
       engines.getEngine('swig').should.have.property('render');
     });
@@ -53,7 +53,6 @@ describe('engines load', function() {
   describe('.load() renderSync', function() {
     it('should load an object of engines onto the `cache`:', function() {
       engines.getEngine('lodash').should.have.property('renderSync');
-      engines.getEngine('underscore').should.have.property('renderSync');
       engines.getEngine('handlebars').should.have.property('renderSync');
       engines.getEngine('swig').should.have.property('renderSync');
     });
