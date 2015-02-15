@@ -1,6 +1,5 @@
 'use strict';
 
-
 var debug = require('debug')('engine-cache');
 var Helpers = require('helper-cache');
 var slice = require('array-slice');
@@ -170,14 +169,14 @@ Engines.prototype.decorate = function(engine) {
       str = this.compile(str, options);
     }
     if (typeof str === 'function') {
-      return engine.helpers.resolve(str(options), callback);
+      return engine.helpers.resolveHelper(str(options), callback);
     }
 
     var opts = options || {};
     opts.helpers = extend({}, engine.helpers, opts.helpers);
     return render.call(this, str, opts, function (err, content) {
       if (err) return callback(err);
-      return engine.helpers.resolve(content, callback);
+      return engine.helpers.resolveHelper(content, callback);
     });
   };
 
