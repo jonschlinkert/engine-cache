@@ -1,10 +1,12 @@
 'use strict';
 
 var debug = require('debug')('engine-cache');
+var AsyncHelpers = require('async-helpers');
 var Helpers = require('helper-cache');
 var slice = require('array-slice');
 var extend = require('extend-shallow');
 var forOwn = require('for-own');
+var async = require('async');
 
 /**
  * Expose `Engines`
@@ -81,6 +83,7 @@ Engines.prototype.setEngine = function (ext, fn, options) {
   engine.compile = engine.compile || fn.compile;
   engine.options = engine.options || fn.options || options || {};
   engine.helpers = new Helpers(options);
+  engine.asyncHelpers = new AsyncHelpers(options);
 
   if (typeof engine.render !== 'function' && typeof engine.renderSync !== 'function') {
     throw new Error('Engines are expected to have a `render` or `renderSync` method.');
@@ -159,6 +162,16 @@ Engines.prototype.decorate = function(engine) {
     return str;
   };
 
+  engine.compile = function (str, options) {
+    if (typeof str === 'function') {
+      return str;
+    }
+    var opts = options || {};
+    engine.asyncHelpers.helpers = extend({}, engine.helpers, opts.helpers);
+    opts.helpers = engine.asyncHelpers.get({wrap: true});
+    return compile(str, opts);
+  }
+
   engine.render = function(str, options, callback) {
     if (typeof options === 'function') {
       callback = options;
@@ -169,14 +182,14 @@ Engines.prototype.decorate = function(engine) {
       str = this.compile(str, options);
     }
     if (typeof str === 'function') {
-      return engine.helpers.resolveHelper(str(options), callback);
+      return engine.resolve(str(options), callback);
     }
 
     var opts = options || {};
     opts.helpers = extend({}, engine.helpers, opts.helpers);
     return render.call(this, str, opts, function (err, content) {
       if (err) return callback(err);
-      return engine.helpers.resolveHelper(content, callback);
+      return engine.resolve(content, callback);
     });
   };
 
@@ -193,14 +206,27 @@ Engines.prototype.decorate = function(engine) {
     return renderSync(str, opts);
   };
 
-  engine.compile = function (str, options) {
-    if (typeof str === 'function') {
-      return str;
-    }
-    var opts = options || {};
-    opts.helpers = extend({}, engine.helpers, opts.helpers);
-    return compile(str, opts);
-  }
+  engine.resolve = function (str, callback) {
+    var self = this;
+    // `stash` contains the objects created when rendering the template
+    var stashed = self.asyncHelpers.stash;
+    async.eachSeries(Object.keys(stashed), function (key, next) {
+      // check to see if the async ID is in the rendered string
+      if (str.indexOf(key) === -1) {
+        return next(null);
+      }
+      self.asyncHelpers.resolve(key, function (err, value) {
+        if (err) return next(err);
+        // replace the async ID with the resolved value
+        str = str.replace(key, value);
+        next(null);
+      });
+    }, function (err) {
+      if (err) return callback(err);
+      callback(null, str);
+    });
+  };
+
 };
 
 /**
