@@ -166,9 +166,9 @@ Engines.prototype.decorate = function(engine) {
     if (typeof str === 'function') {
       return str;
     }
-    var opts = options || {};
-    engine.asyncHelpers.helpers = extend({}, engine.helpers, opts.helpers);
-    opts.helpers = engine.asyncHelpers.get({wrap: true});
+    var opts = extend({}, options);
+    this.asyncHelpers.helpers = extend({}, this.helpers, opts.helpers);
+    opts.helpers = this.asyncHelpers.get({wrap: opts.async});
     return compile(str, opts);
   }
 
@@ -182,14 +182,17 @@ Engines.prototype.decorate = function(engine) {
       str = this.compile(str, options);
     }
     if (typeof str === 'function') {
-      return engine.resolve(str(options), callback);
+      return this.resolve(str(options), callback);
     }
 
-    var opts = options || {};
-    opts.helpers = extend({}, engine.helpers, opts.helpers);
+    var opts = extend({}, options);
+    this.asyncHelpers.helpers = extend({}, this.helpers, opts.helpers);
+    opts.helpers = this.asyncHelpers.get({wrap: true});
+
+    var self = this;
     return render.call(this, str, opts, function (err, content) {
       if (err) return callback(err);
-      return engine.resolve(content, callback);
+      return self.resolve(content, callback);
     });
   };
 
@@ -202,7 +205,7 @@ Engines.prototype.decorate = function(engine) {
     }
 
     var opts = options || {};
-    opts.helpers = extend({}, engine.helpers, opts.helpers);
+    opts.helpers = extend({}, this.helpers, opts.helpers);
     return renderSync(str, opts);
   };
 
