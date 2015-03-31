@@ -3,7 +3,6 @@
 var debug = require('debug')('engine-cache');
 var AsyncHelpers = require('async-helpers');
 var Helpers = require('helper-cache');
-var slice = require('array-slice');
 var extend = require('extend-shallow');
 var forOwn = require('for-own');
 var async = require('async');
@@ -35,7 +34,7 @@ function Engines(engines) {
  */
 
 Engines.prototype.init = function(engines) {
-  debug('init', arguments);
+  debug('init %j', arguments);
   this.cache = engines || {};
 };
 
@@ -55,12 +54,10 @@ Engines.prototype.init = function(engines) {
  */
 
 Engines.prototype.setEngine = function (ext, fn, options) {
-  var args = slice(arguments);
-
-  debug('[set]', arguments);
+  debug('[set]: %s, %j, %j', ext, fn, options);
   var engine = {};
 
-  if (args.length === 3) {
+  if (arguments.length === 3) {
     if (options && (typeof options === 'function' ||
         options.hasOwnProperty('render') ||
         options.hasOwnProperty('renderSync') ||
@@ -124,10 +121,7 @@ Engines.prototype.setEngine = function (ext, fn, options) {
  */
 
 Engines.prototype.getEngine = function(ext) {
-  if (!ext) {
-    return this.cache;
-  }
-
+  if (!ext) return this.cache;
   if (ext[0] !== '.') {
     ext = '.' + ext;
   }
@@ -154,26 +148,23 @@ Engines.prototype.getEngine = function(ext) {
  */
 
 Engines.prototype.decorate = function(engine) {
-  debug('[decorate]', arguments);
+  debug('[decorate]: %j', engine);
 
   var renderSync = engine.renderSync;
   var render = engine.render;
-  var compile = engine.compile || function (str, options) {
+  var compile = engine.compile || function (str) {
     return str;
   };
 
-  engine.compile = function (str, options) {
-    if (typeof str === 'function') {
-      return str;
-    }
-    var opts = extend({}, options);
-    var res = compile(str, mergeHelpers.call(this, opts));
-    return res;
-  }
+  engine.compile = function (str, opts) {
+    if (typeof str === 'function') return str;
+    opts = opts || {};
+    return compile(str, mergeHelpers.call(this, opts));
+  };
 
-  engine.render = function(str, options, callback) {
+  engine.render = function(str, options, cb) {
     if (typeof options === 'function') {
-      callback = options;
+      cb = options;
       options = {};
     }
 
@@ -181,31 +172,31 @@ Engines.prototype.decorate = function(engine) {
       str = this.compile(str, options);
     }
     if (typeof str === 'function') {
-      return this.resolve(str(options), callback);
+      return this.resolve(str(options), cb);
     }
 
-    var opts = extend({async: true}, options);
+    var opts = extend({}, {async: true}, options);
     var self = this;
     return render.call(this, str, mergeHelpers.call(this, opts), function (err, content) {
-      if (err) return callback(err);
-      return self.resolve(content, callback);
+      if (err) return cb(err);
+      return self.resolve(content, cb);
     });
   };
 
-  engine.renderSync = function(str, options) {
+  engine.renderSync = function(str, opts) {
     if (typeof str !== 'function') {
-      str = this.compile(str, options);
+      str = this.compile(str, opts);
     }
     if (typeof str === 'function') {
-      return str(options);
+      return str(opts);
     }
 
-    var opts = options || {};
+    opts = opts || {};
     opts.helpers = extend({}, this.helpers, opts.helpers);
     return renderSync(str, opts);
   };
 
-  engine.resolve = function (str, callback) {
+  engine.resolve = function (str, cb) {
     var self = this;
     // `stash` contains the objects created when rendering the template
     var stashed = self.asyncHelpers.stash;
@@ -221,11 +212,10 @@ Engines.prototype.decorate = function(engine) {
         next(null);
       });
     }, function (err) {
-      if (err) return callback(err);
-      callback(null, str);
+      if (err) return cb(err);
+      cb(null, str);
     });
   };
-
 };
 
 /**
@@ -242,18 +232,15 @@ Engines.prototype.decorate = function(engine) {
  * @api public
  */
 
-Engines.prototype.load = function(obj) {
-  debug('[load]', arguments);
+Engines.prototype.load = function(engines) {
+  debug('[load]: %j', engines);
 
-  var engines = Object.keys(obj);
-  var len = engines.length;
-  var i = 0;
-
-  while (i < len) {
-    var name = engines[i++];
-    var engine = obj[name];
-    if (name !== 'clearCache') {
-      this.setEngine(name, engine);
+  for (var key in engines) {
+    if (engines.hasOwnProperty(key)) {
+      var engine = engines[key];
+      if (key !== 'clearCache') {
+        this.setEngine(key, engine);
+      }
     }
   }
   return this;
@@ -299,9 +286,7 @@ Engines.prototype.helpers = function (ext) {
 
 Engines.prototype.clear = function(ext) {
   if (ext) {
-    if (ext[0] !== '.') {
-      ext = '.' + ext;
-    }
+    if (ext[0] !== '.') ext = '.' + ext;
     delete this.cache[ext];
   } else {
     this.cache = {};
@@ -316,15 +301,13 @@ Engines.prototype.clear = function(ext) {
  * @return {Object} Filter helpers object
  */
 
-function filterHelpers (helpers, async) {
+function filterHelpers(helpers, async) {
   var res = {};
-  var keys = Object.keys(helpers || {});
-  var len = keys.length;
-  var i = 0;
-  while (len--) {
-    var key = keys[i++];
-    if (helpers[key].async == async) {
-      res[key] = helpers[key];
+  for (var key in helpers) {
+    if (helpers.hasOwnProperty(key)) {
+      if (helpers[key].async == async) {
+        res[key] = helpers[key];
+      }
     }
   }
   return res;
@@ -346,7 +329,6 @@ function mergeHelpers (options) {
   options.helpers = extend({},
     filterHelpers(this.helpers),
     filterHelpers(options.helpers),
-    this.asyncHelpers.get({wrap: options.async}));
-
+    this.asyncHelpers.get({wrap: !!options.async}));
   return options;
 }
