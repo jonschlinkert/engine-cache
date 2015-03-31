@@ -11,7 +11,6 @@ var should = require('should');
 var Engines = require('..');
 var engines = new Engines();
 
-
 describe('.renderSync()', function () {
   before(function () {
     engines.init();

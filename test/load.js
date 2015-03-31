@@ -12,7 +12,6 @@ var Engines = require('..');
 var engines;
 
 describe('engines load', function() {
-  /* deps: swig, engine-lodash, handlebars */
   beforeEach(function() {
     engines = new Engines();
 
