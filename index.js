@@ -221,7 +221,7 @@ Engines.prototype.decorate = function(engine) {
       self.asyncHelpers.resolve(key, function (err, value) {
         if (err) return next(err);
         // replace the async ID with the resolved value
-        str = str.replace(key, value);
+        str = str.split(key).join(value);
         next(null);
       });
     }, function (err) {
