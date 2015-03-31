@@ -167,9 +167,8 @@ Engines.prototype.decorate = function(engine) {
       return str;
     }
     var opts = extend({}, options);
-    this.asyncHelpers.helpers = extend({}, this.helpers, opts.helpers);
-    opts.helpers = this.asyncHelpers.get({wrap: opts.async});
-    return compile(str, opts);
+    var res = compile(str, mergeHelpers.call(this, opts));
+    return res;
   }
 
   engine.render = function(str, options, callback) {
@@ -185,12 +184,9 @@ Engines.prototype.decorate = function(engine) {
       return this.resolve(str(options), callback);
     }
 
-    var opts = extend({}, options);
-    this.asyncHelpers.helpers = extend({}, this.helpers, opts.helpers);
-    opts.helpers = this.asyncHelpers.get({wrap: true});
-
+    var opts = extend({async: true}, options);
     var self = this;
-    return render.call(this, str, opts, function (err, content) {
+    return render.call(this, str, mergeHelpers.call(this, opts), function (err, content) {
       if (err) return callback(err);
       return self.resolve(content, callback);
     });
@@ -311,3 +307,46 @@ Engines.prototype.clear = function(ext) {
     this.cache = {};
   }
 };
+
+/**
+ * Get helpers that match the given `async` flag.
+ *
+ * @param  {Object} `helpers` Helpers to filter
+ * @param  {Boolean} `async` Get either async or sync helpers
+ * @return {Object} Filter helpers object
+ */
+
+function filterHelpers (helpers, async) {
+  var res = {};
+  var keys = Object.keys(helpers || {});
+  var len = keys.length;
+  var i = 0;
+  while (len--) {
+    var key = keys[i++];
+    if (helpers[key].async == async) {
+      res[key] = helpers[key];
+    }
+  }
+  return res;
+}
+
+/**
+ * Merge the local engine helpers with the options helpers.
+ * Ensure only async helpers are passed to `async-helpers` for processing.
+ *
+ * @param  {Object} `options` Options passed into `render` or `compile`
+ * @return {Object} Options object with merged helpers
+ */
+
+function mergeHelpers (options) {
+  this.asyncHelpers.helpers = extend({},
+    filterHelpers(this.helpers, true),
+    filterHelpers(options.helpers, true));
+
+  options.helpers = extend({},
+    filterHelpers(this.helpers),
+    filterHelpers(options.helpers),
+    this.asyncHelpers.get({wrap: options.async}));
+
+  return options;
+}
