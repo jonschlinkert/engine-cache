@@ -3,7 +3,7 @@
 var debug = require('debug')('engine-cache');
 var AsyncHelpers = require('async-helpers');
 var Helpers = require('helper-cache');
-var extend = require('extend-shallow');
+var merge = require('mixin-deep');
 var forOwn = require('for-own');
 var async = require('async');
 
@@ -78,7 +78,7 @@ Engines.prototype.setEngine = function (ext, fn, options) {
     engine.renderFile = fn.renderFile || fn.__express;
   }
   engine.compile = engine.compile || fn.compile;
-  engine.options = engine.options || fn.options || options || {};
+  engine.options = merge({}, engine.options || {}, fn.options || {}, options || {});
   engine.helpers = new Helpers(options);
   engine.asyncHelpers = new AsyncHelpers(options);
 
@@ -93,7 +93,6 @@ Engines.prototype.setEngine = function (ext, fn, options) {
   }
 
   this.decorate(engine);
-
   if (ext[0] !== '.') {
     ext = '.' + ext;
   }
@@ -175,7 +174,7 @@ Engines.prototype.decorate = function(engine) {
       return this.resolve(str(options), cb);
     }
 
-    var opts = extend({}, {async: true}, options);
+    var opts = merge({}, {async: true}, options);
     var self = this;
     return render.call(this, str, mergeHelpers.call(this, opts), function (err, content) {
       if (err) return cb(err);
@@ -192,7 +191,7 @@ Engines.prototype.decorate = function(engine) {
     }
 
     opts = opts || {};
-    opts.helpers = extend({}, this.helpers, opts.helpers);
+    opts.helpers = merge({}, this.helpers, opts.helpers);
     return renderSync(str, opts);
   };
 
@@ -322,11 +321,11 @@ function filterHelpers(helpers, async) {
  */
 
 function mergeHelpers (options) {
-  this.asyncHelpers.helpers = extend({},
+  this.asyncHelpers.helpers = merge({},
     filterHelpers(this.helpers, true),
     filterHelpers(options.helpers, true));
 
-  options.helpers = extend({},
+  options.helpers = merge({},
     filterHelpers(this.helpers),
     filterHelpers(options.helpers),
     this.asyncHelpers.get({wrap: !!options.async}));
