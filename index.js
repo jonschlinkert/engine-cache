@@ -155,13 +155,13 @@ Engines.prototype.decorate = function(engine) {
     return str;
   };
 
-  engine.compile = function (str, opts) {
+  engine.compile = function wrappedCompile(str, opts) {
     if (typeof str === 'function') return str;
     opts = opts || {};
     return compile(str, mergeHelpers.call(this, opts));
   };
 
-  engine.render = function(str, options, cb) {
+  engine.render = function wrappedRender(str, options, cb) {
     if (typeof options === 'function') {
       cb = options;
       options = {};
@@ -182,7 +182,7 @@ Engines.prototype.decorate = function(engine) {
     });
   };
 
-  engine.renderSync = function(str, opts) {
+  engine.renderSync = function wrappedRenderSync(str, opts) {
     if (typeof str !== 'function') {
       str = this.compile(str, opts);
     }
@@ -195,7 +195,7 @@ Engines.prototype.decorate = function(engine) {
     return renderSync(str, opts);
   };
 
-  engine.resolve = function (str, cb) {
+  engine.resolve = function resolveHelpers(str, cb) {
     var self = this;
     // `stash` contains the objects created when rendering the template
     var stashed = self.asyncHelpers.stash;
