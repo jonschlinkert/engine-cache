@@ -19,14 +19,24 @@ describe('engines render', function () {
   });
 
   describe('.render()', function () {
-    it('should render content with a cached engine: [handlebars].', function(done) {
+    it('should error when bad args are passed.', function(cb) {
+      engines.setEngine('hbs', consolidate.handlebars);
+      var hbs = engines.getEngine('hbs');
+
+      hbs.render(null, function (err, content) {
+        err.message.should.equal('engine-cache `render` expects a string or function.');
+        cb();
+      });
+    });
+
+    it('should render content with a cached engine: [handlebars].', function(cb) {
       engines.setEngine('hbs', consolidate.handlebars);
       var hbs = engines.getEngine('hbs');
 
       hbs.render('{{name}}', {name: 'Jon Schlinkert'}, function (err, content) {
         if (err) console.log(err);
         content.should.equal('Jon Schlinkert');
-        done();
+        cb();
       });
     });
   });

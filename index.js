@@ -167,27 +167,39 @@ Engines.prototype.decorate = function(engine) {
       options = {};
     }
 
-    if (typeof str !== 'function') {
-      str = this.compile(str, options);
+    if (typeof cb !== 'function') {
+      throw new TypeError('engine-cache `render` expects a callback function.');
     }
+
     if (typeof str === 'function') {
       return this.resolve(str(options), cb);
+
+    } else if (typeof str === 'string') {
+      str = this.compile(str, options);
+
+    } else {
+      return cb(new TypeError('engine-cache `render` expects a string or function.'));
     }
 
     var opts = merge({}, {async: true}, options);
+    var ctx = mergeHelpers.call(this, opts);
     var self = this;
-    return render.call(this, str, mergeHelpers.call(this, opts), function (err, content) {
+
+    return render.call(this, str, ctx, function (err, content) {
       if (err) return cb(err);
       return self.resolve(content, cb);
     });
   };
 
   engine.renderSync = function wrappedRenderSync(str, opts) {
-    if (typeof str !== 'function') {
-      str = this.compile(str, opts);
-    }
     if (typeof str === 'function') {
       return str(opts);
+
+    } else if (typeof str === 'string') {
+      str = this.compile(str, opts);
+
+    } else {
+      throw new TypeError('engine-cache `renderSync` expects a string or function.');
     }
 
     opts = opts || {};
@@ -196,6 +208,13 @@ Engines.prototype.decorate = function(engine) {
   };
 
   engine.resolve = function resolveHelpers(str, cb) {
+    if (typeof cb !== 'function') {
+      throw new TypeError('engine-cache `resolve` expects a callback function.');
+    }
+    if (typeof str !== 'string') {
+      return cb(new TypeError('engine-cache `resolve` expects a string.'));
+    }
+
     var self = this;
     // `stash` contains the objects created when rendering the template
     var stashed = self.asyncHelpers.stash;
@@ -285,7 +304,7 @@ Engines.prototype.helpers = function (ext) {
 
 Engines.prototype.clear = function(ext) {
   if (ext) {
-    if (ext[0] !== '.') ext = '.' + ext;
+    if (ext && ext.charAt(0) !== '.') ext = '.' + ext;
     delete this.cache[ext];
   } else {
     this.cache = {};
