@@ -1,11 +1,9 @@
 'use strict';
 
-var debug = require('debug')('engine-cache');
 var AsyncHelpers = require('async-helpers');
 var Helpers = require('helper-cache');
-var merge = require('mixin-deep');
-var forOwn = require('for-own');
 var async = require('async');
+var _ = require('lodash');
 
 /**
  * Expose `Engines`
@@ -34,7 +32,6 @@ function Engines(engines) {
  */
 
 Engines.prototype.init = function(engines) {
-  debug('init %j', arguments);
   this.cache = engines || {};
 };
 
@@ -54,9 +51,7 @@ Engines.prototype.init = function(engines) {
  */
 
 Engines.prototype.setEngine = function (ext, fn, options) {
-  debug('[set]: %s, %j, %j', ext, fn, options);
   var engine = {};
-
   if (arguments.length === 3) {
     if (options && (typeof options === 'function' ||
         options.hasOwnProperty('render') ||
@@ -65,20 +60,27 @@ Engines.prototype.setEngine = function (ext, fn, options) {
       var opts = fn;
       fn = options;
       options = opts;
+      opts = null;
     }
   }
 
-  if (typeof fn === 'function') {
-    engine.render = fn.render || fn;
-    if (fn.renderSync) {
-      engine.renderSync = fn.renderSync;
-    }
-  } else if (typeof fn === 'object') {
-    engine = fn || this.noop;
-    engine.renderFile = fn.renderFile || fn.__express;
+  var type = typeof fn;
+  if (type !== 'object' && type !== 'function') {
+    throw new TypeError('engine-cache expects engines to be an object or function.');
   }
-  engine.compile = engine.compile || fn.compile;
-  engine.options = merge({}, engine.options || {}, fn.options || {}, options || {});
+
+  engine.render = fn.render || fn;
+  if (fn.renderFile) {
+    engine.renderFile = fn.renderFile;
+  }
+  if (fn.__express) {
+    engine.renderFile = fn.__express;
+  }
+  for (var key in fn) {
+    engine[key] = fn[key];
+  }
+
+  engine.options = _.merge({}, engine.options, fn.options, options);
   engine.helpers = new Helpers(options);
   engine.asyncHelpers = new AsyncHelpers(options);
 
@@ -93,11 +95,10 @@ Engines.prototype.setEngine = function (ext, fn, options) {
   }
 
   this.decorate(engine);
-  if (ext[0] !== '.') {
+  if (ext.charAt(0) !== '.') {
     ext = '.' + ext;
   }
 
-  debug('[set] %s: %j', ext, engine);
   this.cache[ext] = engine;
   return this;
 };
@@ -147,8 +148,6 @@ Engines.prototype.getEngine = function(ext) {
  */
 
 Engines.prototype.decorate = function(engine) {
-  debug('[decorate]: %j', engine);
-
   var renderSync = engine.renderSync;
   var render = engine.render;
   var compile = engine.compile || function (str) {
@@ -181,7 +180,7 @@ Engines.prototype.decorate = function(engine) {
       return cb(new TypeError('engine-cache `render` expects a string or function.'));
     }
 
-    var opts = merge({}, {async: true}, options);
+    var opts = _.extend({async: true}, options);
     var ctx = mergeHelpers.call(this, opts);
     var self = this;
 
@@ -203,7 +202,7 @@ Engines.prototype.decorate = function(engine) {
     }
 
     opts = opts || {};
-    opts.helpers = merge({}, this.helpers, opts.helpers);
+    opts.helpers = _.merge({}, this.helpers, opts.helpers);
     return renderSync(str, opts);
   };
 
@@ -251,8 +250,6 @@ Engines.prototype.decorate = function(engine) {
  */
 
 Engines.prototype.load = function(engines) {
-  debug('[load]: %j', engines);
-
   for (var key in engines) {
     if (engines.hasOwnProperty(key)) {
       var engine = engines[key];
@@ -340,11 +337,11 @@ function filterHelpers(helpers, async) {
  */
 
 function mergeHelpers (options) {
-  this.asyncHelpers.helpers = merge({},
+  this.asyncHelpers.helpers = _.merge({},
     filterHelpers(this.helpers, true),
     filterHelpers(options.helpers, true));
 
-  options.helpers = merge({},
+  options.helpers = _.merge({},
     filterHelpers(this.helpers),
     filterHelpers(options.helpers),
     this.asyncHelpers.get({wrap: !!options.async}));
