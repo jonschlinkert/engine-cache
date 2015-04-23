@@ -1,4 +1,4 @@
-# engine-cache [![NPM version](https://badge.fury.io/js/engine-cache.svg)](http://badge.fury.io/js/engine-cache)  [![Build Status](https://travis-ci.org/jonschlinkert/engine-cache.svg)](https://travis-ci.org/jonschlinkert/engine-cache)
+# engine-cache [![NPM version](https://badge.fury.io/js/engine-cache.svg)](http://badge.fury.io/js/engine-cache)  [![Build Status](https://travis-ci.org/jonschlinkert/engine-cache.svg)](https://travis-ci.org/jonschlinkert/engine-cache) 
 
 > express.js inspired template-engine manager.
 
@@ -114,11 +114,11 @@ Pull requests and stars are always welcome. For bugs and feature requests, [plea
 ## Author
 **Jon Schlinkert**
 
-+ [github/jonschlinkert](https://github.com/jonschlinkert)
-+ [twitter/jonschlinkert](http://twitter.com/jonschlinkert)
+[github/jonschlinkert](https://github.com/jonschlinkert)
+[twitter/jonschlinkert](http://twitter.com/jonschlinkert)
 
 ## License
-Copyright (c) 2014-2015 Jon Schlinkert  
+Copyright (c) 2014-2015 Jon Schlinkert
 Released under the MIT license
 
 ***
