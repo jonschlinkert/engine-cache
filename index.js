@@ -222,6 +222,7 @@ Engines.prototype.decorate = function(engine) {
       if (str.indexOf(key) === -1) {
         return next(null);
       }
+
       self.asyncHelpers.resolve(key, function (err, value) {
         if (err) return next(err);
         // replace the async ID with the resolved value
@@ -309,41 +310,14 @@ Engines.prototype.clear = function(ext) {
 };
 
 /**
- * Get helpers that match the given `async` flag.
- *
- * @param  {Object} `helpers` Helpers to filter
- * @param  {Boolean} `async` Get either async or sync helpers
- * @return {Object} Filter helpers object
- */
-
-function filterHelpers(helpers, async) {
-  var res = {};
-  for (var key in helpers) {
-    if (helpers.hasOwnProperty(key)) {
-      if (helpers[key].async == async) {
-        res[key] = helpers[key];
-      }
-    }
-  }
-  return res;
-}
-
-/**
  * Merge the local engine helpers with the options helpers.
- * Ensure only async helpers are passed to `async-helpers` for processing.
  *
  * @param  {Object} `options` Options passed into `render` or `compile`
  * @return {Object} Options object with merged helpers
  */
 
-function mergeHelpers (options) {
-  this.asyncHelpers.helpers = _.merge({},
-    filterHelpers(this.helpers, true),
-    filterHelpers(options.helpers, true));
-
-  options.helpers = _.merge({},
-    filterHelpers(this.helpers),
-    filterHelpers(options.helpers),
-    this.asyncHelpers.get({wrap: !!options.async}));
-  return options;
+function mergeHelpers (opts) {
+  _.merge(this.asyncHelpers.helpers, this.helpers, opts.helpers);
+  opts.helpers = this.asyncHelpers.get({wrap: opts.async});
+  return opts;
 }
