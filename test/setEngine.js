@@ -7,8 +7,8 @@
 
 'use strict';
 
+require('should');
 var assert = require('assert');
-var should = require('should');
 var Engines = require('..');
 var engines;
 

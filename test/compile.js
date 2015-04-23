@@ -7,7 +7,7 @@
 
 'use strict';
 
-var should = require('should');
+require('should');
 var Engines = require('..');
 var engines = new Engines();
 var engine = require('engine-handlebars');
