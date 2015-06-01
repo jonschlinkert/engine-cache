@@ -1,9 +1,9 @@
 'use strict';
 
+var extend = require('extend-shallow');
 var AsyncHelpers = require('async-helpers');
 var Helpers = require('helper-cache');
 var async = require('async');
-var _ = require('lodash');
 
 /**
  * Expose `Engines`
@@ -80,7 +80,7 @@ Engines.prototype.setEngine = function (ext, fn, options) {
     engine[key] = fn[key];
   }
 
-  engine.options = _.merge({}, engine.options, fn.options, options);
+  engine.options = extend({}, engine.options, fn.options, options);
   engine.helpers = new Helpers(options);
   engine.asyncHelpers = new AsyncHelpers(options);
 
@@ -89,9 +89,9 @@ Engines.prototype.setEngine = function (ext, fn, options) {
   }
 
   if (engine.render) {
-    engine.name = engine.render.name || 'unknown';
+    engine.name = engine.render.name;
   } else {
-    engine.name = engine.renderSync.name || 'unknown';
+    engine.name = engine.renderSync.name;
   }
 
   this.decorate(engine);
@@ -180,7 +180,7 @@ Engines.prototype.decorate = function(engine) {
       return cb(new TypeError('engine-cache `render` expects a string or function.'));
     }
 
-    var opts = _.extend({async: true}, options);
+    var opts = extend({async: true}, options);
     var ctx = mergeHelpers.call(this, opts);
     var self = this;
 
@@ -202,7 +202,7 @@ Engines.prototype.decorate = function(engine) {
     }
 
     opts = opts || {};
-    opts.helpers = _.merge({}, this.helpers, opts.helpers);
+    opts.helpers = extend({}, this.helpers, opts.helpers);
     return renderSync(str, opts);
   };
 
@@ -317,7 +317,7 @@ Engines.prototype.clear = function(ext) {
  */
 
 function mergeHelpers (opts) {
-  _.merge(this.asyncHelpers.helpers, this.helpers, opts.helpers);
+  extend(this.asyncHelpers.helpers, this.helpers, opts.helpers);
   opts.helpers = this.asyncHelpers.get({wrap: opts.async});
   return opts;
 }
