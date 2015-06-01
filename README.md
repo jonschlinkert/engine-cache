@@ -1,11 +1,11 @@
-# engine-cache [![NPM version](https://badge.fury.io/js/engine-cache.svg)](http://badge.fury.io/js/engine-cache)  [![Build Status](https://travis-ci.org/jonschlinkert/engine-cache.svg)](https://travis-ci.org/jonschlinkert/engine-cache) 
+# engine-cache [![NPM version](https://badge.fury.io/js/engine-cache.svg)](http://badge.fury.io/js/engine-cache)  [![Build Status](https://travis-ci.org/jonschlinkert/engine-cache.svg)](https://travis-ci.org/jonschlinkert/engine-cache)
 
 > express.js inspired template-engine manager.
 
-## Install with [npm](npmjs.org)
+Install with [npm](https://www.npmjs.com/)
 
-```bash
-npm i engine-cache --save
+```sh
+$ npm i engine-cache --save
 ```
 
 ## Usage
@@ -15,9 +15,14 @@ var Engines = require('engine-cache');
 ```
 
 ## API
+
 ### [Engines](index.js#L24)
 
-* `engines` **{Object}**: Optionally pass an object of engines to initialize with.    
+**Params**
+
+* `engines` **{Object}**: Optionally pass an object of engines to initialize with.
+
+**Example**
 
 ```js
 var Engines = require('engine-cache');
@@ -28,10 +33,14 @@ var engines = new Engines();
 
 Register the given view engine callback `fn` as `ext`.
 
-* `ext` **{String}**    
-* `options` **{Object|Function}**: or callback `fn`.    
-* `fn` **{Function}**: Callback.    
-* `returns` **{Object}** `Engines`: to enable chaining.  
+**Params**
+
+* `ext` **{String}**
+* `options` **{Object|Function}**: or callback `fn`.
+* `fn` **{Function}**: Callback.
+* `returns` **{Object}** `Engines`: to enable chaining.
+
+**Example**
 
 ```js
 var consolidate = require('consolidate')
@@ -42,8 +51,12 @@ engines.setEngine('hbs', consolidate.handlebars)
 
 Return the engine stored by `ext`. If no `ext` is passed, the entire cache is returned.
 
-* `ext` **{String}**: The engine to get.    
-* `returns` **{Object}**: The specified engine.  
+**Params**
+
+* `ext` **{String}**: The engine to get.
+* `returns` **{Object}**: The specified engine.
+
+**Example**
 
 ```js
 var consolidate = require('consolidate')
@@ -57,8 +70,12 @@ engine.getEngine('hbs');
 
 Load an object of engines onto the `cache`. Mostly useful for testing, but exposed as a public method.
 
-* `obj` **{Object}**: Engines to load.    
-* `returns` **{Object}** `Engines`: to enable chaining.  
+**Params**
+
+* `obj` **{Object}**: Engines to load.
+* `returns` **{Object}** `Engines`: to enable chaining.
+
+**Example**
 
 ```js
 engines.load(require('consolidate'))
@@ -68,10 +85,16 @@ engines.load(require('consolidate'))
 
 Get and set helpers for the given `ext` (engine). If no `ext` is passed, the entire helper cache is returned.
 
-* `ext` **{String}**: The helper cache to get and set to.    
-* `returns` **{Object}**: Object of helpers for the specified engine.  
-
 **Example:**
+
+See [helper-cache](https://github.com/jonschlinkert/helper-cache)for any related issues, API details, and documentation.
+
+**Params**
+
+* `ext` **{String}**: The helper cache to get and set to.
+* `returns` **{Object}**: Object of helpers for the specified engine.
+
+**Example**
 
 ```js
 var helpers = engines.helpers('hbs');
@@ -80,50 +103,56 @@ helpers.getHelper('foo');
 helpers.getHelper();
 ```
 
-See [helper-cache] for any related issues, API details, and documentation.
-
 ### [.clear](index.js#L303)
 
 Remove `ext` engine from the cache, or if no value is specified the entire cache is reset.
 
-* `ext` **{String}**: The engine to remove.    
-
 **Example:**
+
+**Params**
+
+* `ext` **{String}**: The engine to remove.
+
+**Example**
 
 ```js
 engines.clear()
 ```
 
 ## Related
-* [async-helpers](https://github.com/doowb/async-helpers): Use async helpers in templates with engines that typically only… [more](https://github.com/doowb/async-helpers)
-* [handlebars-helpers](https://github.com/assemble/handlebars-helpers): 120+ Handlebars helpers in ~20 categories, for Assemble, YUI, Ghost… [more](https://github.com/assemble/handlebars-helpers)
-* [helper-cache](https://github.com/jonschlinkert/helper-cache): Easily register and get helper functions to be passed to… [more](https://github.com/jonschlinkert/helper-cache)
-* [template-helpers](https://github.com/jonschlinkert/template-helpers): Generic JavaScript helpers that can be used with any template… [more](https://github.com/jonschlinkert/template-helpers)
-* [template](https://github.com/jonschlinkert/template): Render templates from any engine. Make custom template types, use… [more](https://github.com/jonschlinkert/template)
+
+* [async-helpers](https://github.com/doowb/async-helpers): Use async helpers in templates with engines that typically only handle sync helpers. Handlebars and… [more](https://github.com/doowb/async-helpers)
+* [helper-cache](https://github.com/jonschlinkert/helper-cache): Easily register and get helper functions to be passed to any template engine or node.js… [more](https://github.com/jonschlinkert/helper-cache)
+* [handlebars-helpers](https://github.com/assemble/handlebars-helpers): 120+ Handlebars helpers in ~20 categories, for Assemble, YUI, Ghost or any Handlebars project. Includes… [more](https://github.com/assemble/handlebars-helpers)
+* [template](https://github.com/jonschlinkert/template): Render templates using any engine. Supports, layouts, pages, partials and custom template types. Use template… [more](https://github.com/jonschlinkert/template)
+* [template-helpers](https://github.com/jonschlinkert/template-helpers): Generic JavaScript helpers that can be used with any template engine. Handlebars, Lo-Dash, Underscore, or… [more](https://github.com/jonschlinkert/template-helpers)
 
 ## Running tests
+
 Install dev dependencies:
 
-```bash
-npm i -d && npm test
+```sh
+$ npm i -d && npm test
 ```
 
 ## Contributing
-Pull requests and stars are always welcome. For bugs and feature requests, [please create an issue](https://github.com/jonschlinkert/engine-cache/issues)
+
+Pull requests and stars are always welcome. For bugs and feature requests, [please create an issue](https://github.com/jonschlinkert/engine-cache/issues/new)
 
 ## Author
+
 **Jon Schlinkert**
 
-[github/jonschlinkert](https://github.com/jonschlinkert)
-[twitter/jonschlinkert](http://twitter.com/jonschlinkert)
++ [github/jonschlinkert](https://github.com/jonschlinkert)
++ [twitter/jonschlinkert](http://twitter.com/jonschlinkert)
 
 ## License
-Copyright (c) 2014-2015 Jon Schlinkert
-Released under the MIT license
+
+Copyright © 2014-2015 Jon Schlinkert
+Released under the MIT license.
 
 ***
 
-_This file was generated by [verb-cli](https://github.com/assemble/verb-cli) on April 23, 2015._
+_This file was generated by [verb-cli](https://github.com/assemble/verb-cli) on June 01, 2015._
 
-[helper-cache]: https://github.com/jonschlinkert/helper-cache
 <!-- deps: swig lodash mocha engine-lodash handlebars -->
