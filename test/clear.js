@@ -7,6 +7,7 @@
 
 'use strict';
 
+/* deps: mocha handlebars swig */
 require('should');
 var Engines = require('..');
 var engines = new Engines();

@@ -38,8 +38,8 @@
     "test": "mocha"
   },
   "dependencies": {
-    "async": "^1.1.0",
-    "async-helpers": "^0.2.2",
+    "async": "^1.2.0",
+    "async-helpers": "^0.2.5",
     "extend-shallow": "^1.1.4",
     "helper-cache": "^0.7.1"
   },
