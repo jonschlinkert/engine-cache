@@ -1,7 +1,7 @@
 {
   "name": "engine-cache",
   "description": "express.js inspired template-engine manager.",
-  "version": "0.12.2",
+  "version": "0.13.0",
   "homepage": "https://github.com/jonschlinkert/engine-cache",
   "author": {
     "name": "Jon Schlinkert",
@@ -38,15 +38,14 @@
     "test": "mocha"
   },
   "dependencies": {
-    "async": "^1.2.0",
-    "async-helpers": "^0.2.5",
+    "async-helpers": "^0.3.0",
     "extend-shallow": "^1.1.4",
     "helper-cache": "^0.7.1"
   },
   "devDependencies": {
     "consolidate": "^0.12.1",
     "engine-handlebars": "^0.6.1",
-    "engine-lodash": "^0.6.3",
+    "engine-lodash": "^0.7.1",
     "engines": "^0.4.0",
     "handlebars": "^3.0.2",
     "mocha": "^2.2.4",
