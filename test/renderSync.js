@@ -9,11 +9,11 @@
 
 require('should');
 var Engines = require('..');
-var engines = new Engines();
+var engines;
 
 describe('.renderSync()', function () {
   before(function () {
-    engines.init();
+    engines = new Engines();
     engines.load(require('engines'));
   });
 

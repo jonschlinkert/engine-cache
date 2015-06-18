@@ -39,5 +39,16 @@ describe('engines render', function () {
         cb();
       });
     });
+
+    it('should format engine errors.', function(cb) {
+      engines.setEngine('tmpl', require('engine-lodash'));
+      var tmpl = engines.getEngine('tmpl');
+
+      tmpl.render('<%= foo %>', function (err, content) {
+        if (err) console.log(err);
+        // content.should.equal('Jon Schlinkert');
+        cb();
+      });
+    });
   });
 });

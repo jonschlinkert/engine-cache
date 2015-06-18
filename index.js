@@ -3,7 +3,6 @@
 var extend = require('extend-shallow');
 var AsyncHelpers = require('async-helpers');
 var Helpers = require('helper-cache');
-var async = require('async');
 
 /**
  * Expose `Engines`
@@ -22,18 +21,8 @@ module.exports = Engines;
  */
 
 function Engines(engines) {
-  this.init(engines);
-}
-
-/**
- * Initialize default configuration.
- *
- * @api private
- */
-
-Engines.prototype.init = function(engines) {
   this.cache = engines || {};
-};
+}
 
 /**
  * Register the given view engine callback `fn` as `ext`.
@@ -88,9 +77,11 @@ Engines.prototype.setEngine = function (ext, fn, options) {
     throw new Error('Engines are expected to have a `render` or `renderSync` method.');
   }
 
-  if (engine.render) {
+  if (!engine.name && engine.render) {
     engine.name = engine.render.name;
-  } else {
+  }
+
+  if (!engine.name && engine.renderSync) {
     engine.name = engine.renderSync.name;
   }
 
@@ -125,12 +116,10 @@ Engines.prototype.getEngine = function(ext) {
   if (ext[0] !== '.') {
     ext = '.' + ext;
   }
-
   var engine = this.cache[ext];
   if (!engine) {
     engine = this.cache['.*'];
   }
-
   return engine;
 };
 
@@ -165,15 +154,17 @@ Engines.prototype.decorate = function(engine) {
       cb = options;
       options = {};
     }
+    var orig;
 
     if (typeof cb !== 'function') {
       throw new TypeError('engine-cache `render` expects a callback function.');
     }
 
     if (typeof str === 'function') {
-      return this.resolve(str(options), cb);
+      return engine.asyncHelpers.resolveIds(str(options), cb);
 
     } else if (typeof str === 'string') {
+      orig = str;
       str = this.compile(str, options);
 
     } else {
@@ -182,11 +173,14 @@ Engines.prototype.decorate = function(engine) {
 
     var opts = extend({async: true}, options);
     var ctx = mergeHelpers.call(this, opts);
-    var self = this;
 
     return render.call(this, str, ctx, function (err, content) {
       if (err) return cb(err);
-      return self.resolve(content, cb);
+
+      if (content instanceof Error) {
+        return cb(content);
+      }
+      return engine.asyncHelpers.resolveIds(content, cb);
     });
   };
 
@@ -204,35 +198,6 @@ Engines.prototype.decorate = function(engine) {
     opts = opts || {};
     opts.helpers = extend({}, this.helpers, opts.helpers);
     return renderSync(str, opts);
-  };
-
-  engine.resolve = function resolveHelpers(str, cb) {
-    if (typeof cb !== 'function') {
-      throw new TypeError('engine-cache `resolve` expects a callback function.');
-    }
-    if (typeof str !== 'string') {
-      return cb(new TypeError('engine-cache `resolve` expects a string.'));
-    }
-
-    var self = this;
-    // `stash` contains the objects created when rendering the template
-    var stashed = self.asyncHelpers.stash;
-    async.eachSeries(Object.keys(stashed), function (key, next) {
-      // check to see if the async ID is in the rendered string
-      if (str.indexOf(key) === -1) {
-        return next(null);
-      }
-
-      self.asyncHelpers.resolve(key, function (err, value) {
-        if (err) return next(err);
-        // replace the async ID with the resolved value
-        str = str.split(key).join(value);
-        next(null);
-      });
-    }, function (err) {
-      if (err) return cb(err);
-      cb(null, str);
-    });
   };
 };
 
@@ -270,8 +235,8 @@ Engines.prototype.load = function(engines) {
  *
  * ```js
  * var helpers = engines.helpers('hbs');
- * helpers.addHelper('foo', function() {});
- * helpers.getHelper('foo');
+ * helpers.addHelper('bar', function() {});
+ * helpers.getHelper('bar');
  * helpers.getHelper();
  * ```
  *
