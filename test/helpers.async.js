@@ -32,7 +32,7 @@ describe('async helpers', function () {
     });
   });
 
-  it('should render content with handlebars.', function(done) {
+  it('should render content with multiple helpers in handlebars.', function(done) {
     engines.setEngine('hbs', consolidate.handlebars);
     var helpers = engines.helpers('hbs');
     helpers.addAsyncHelper('upper', function (str, options, callback) {

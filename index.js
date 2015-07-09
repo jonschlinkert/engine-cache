@@ -139,14 +139,42 @@ Engines.prototype.getEngine = function(ext) {
 Engines.prototype.decorate = function(engine) {
   var renderSync = engine.renderSync;
   var render = engine.render;
-  var compile = engine.compile || function (str) {
-    return str;
-  };
+  var compile = engine.compile;
 
   engine.compile = function wrappedCompile(str, opts) {
     if (typeof str === 'function') return str;
     opts = opts || {};
-    return compile(str, mergeHelpers.call(this, opts));
+    var fn = compile && compile(str, mergeHelpers.call(this, opts));
+    return function (locals, cb) {
+      var content = str;
+      if (typeof fn === 'function') {
+        // already compiled
+        try {
+          content = fn(locals);
+        } catch (err) {
+          if (typeof cb === 'function') return cb(err);
+          throw err;
+        }
+        if (typeof cb !== 'function') {
+          return content;
+        } else {
+          return engine.asyncHelpers.resolveIds(content, cb);
+        }
+      } else {
+        var ctx = extend({}, mergeHelpers.call(this, opts), locals);
+        if (typeof cb !== 'function') {
+          return renderSync(content, ctx);
+        } else {
+          return render(content, ctx, function (err, content) {
+            if (err) return cb(err);
+            if (content instanceof Error) {
+              return cb(content);
+            }
+            return engine.asyncHelpers.resolveIds(content, cb);
+          });
+        }
+      }
+    }.bind(this);
   };
 
   engine.render = function wrappedRender(str, options, cb) {
@@ -154,50 +182,31 @@ Engines.prototype.decorate = function(engine) {
       cb = options;
       options = {};
     }
-    var orig;
 
     if (typeof cb !== 'function') {
       throw new TypeError('engine-cache `render` expects a callback function.');
     }
 
     if (typeof str === 'function') {
-      return engine.asyncHelpers.resolveIds(str(options), cb);
-
+      return str(options, cb);
     } else if (typeof str === 'string') {
-      orig = str;
-      str = this.compile(str, options);
-
-    } else {
-      return cb(new TypeError('engine-cache `render` expects a string or function.'));
+      var opts = extend({async: true}, options);
+      str = this.compile(str, opts);
+      return str(opts, cb);
     }
-
-    var opts = extend({async: true}, options);
-    var ctx = mergeHelpers.call(this, opts);
-
-    return render.call(this, str, ctx, function (err, content) {
-      if (err) return cb(err);
-
-      if (content instanceof Error) {
-        return cb(content);
-      }
-      return engine.asyncHelpers.resolveIds(content, cb);
-    });
+    return cb(new TypeError('engine-cache `render` expects a string or function.'));
   };
 
-  engine.renderSync = function wrappedRenderSync(str, opts) {
+  engine.renderSync = function wrappedRenderSync(str, options) {
     if (typeof str === 'function') {
-      return str(opts);
-
+      return str(options);
     } else if (typeof str === 'string') {
+      var opts = extend({}, options);
+      opts.helpers = extend({}, this.helpers, opts.helpers);
       str = this.compile(str, opts);
-
-    } else {
-      throw new TypeError('engine-cache `renderSync` expects a string or function.');
+      return str(opts);
     }
-
-    opts = opts || {};
-    opts.helpers = extend({}, this.helpers, opts.helpers);
-    return renderSync(str, opts);
+    throw new TypeError('engine-cache `renderSync` expects a string or function.');
   };
 };
 

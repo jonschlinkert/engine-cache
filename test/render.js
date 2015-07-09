@@ -19,35 +19,36 @@ describe('engines render', function () {
   });
 
   describe('.render()', function () {
-    it('should error when bad args are passed.', function(cb) {
+    it('should error when bad args are passed.', function(done) {
       engines.setEngine('hbs', consolidate.handlebars);
       var hbs = engines.getEngine('hbs');
 
       hbs.render(null, function (err, content) {
+        if (!err) return done(new Error('Expected an error'));
         err.message.should.equal('engine-cache `render` expects a string or function.');
-        cb();
+        done();
       });
     });
 
-    it('should render content with a cached engine: [handlebars].', function(cb) {
+    it('should render content with a cached engine: [handlebars].', function(done) {
       engines.setEngine('hbs', consolidate.handlebars);
       var hbs = engines.getEngine('hbs');
 
       hbs.render('{{name}}', {name: 'Jon Schlinkert'}, function (err, content) {
-        if (err) console.log(err);
+        if (err) return done(err);
         content.should.equal('Jon Schlinkert');
-        cb();
+        done();
       });
     });
 
-    it('should format engine errors.', function(cb) {
+    it('should format engine errors.', function(done) {
       engines.setEngine('tmpl', require('engine-lodash'));
       var tmpl = engines.getEngine('tmpl');
 
       tmpl.render('<%= foo %>', function (err, content) {
-        if (err) console.log(err);
+        if (!err) return done(new Error('Expected an error'));
         // content.should.equal('Jon Schlinkert');
-        cb();
+        done();
       });
     });
   });
