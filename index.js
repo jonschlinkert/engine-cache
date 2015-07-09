@@ -141,6 +141,23 @@ Engines.prototype.decorate = function(engine) {
   var render = engine.render;
   var compile = engine.compile;
 
+  /**
+   * Wrapped compile function for all engines loaded onto engine-cache.
+   * If possible, compiles the string with the original engine's compile function.
+   * Returns a render function that will either use the original engine's compiled function
+   * or the `render/renderSync` methods and will resolve async helper ids.
+   *
+   * ```js
+   * var fn = engine.compile('<%= upper(foo) %>', {imports: {'upper': upper}});
+   * console.log(fn({foo: 'bar'})));
+   * //=> BAR
+   * ```
+   *
+   * @param  {String} `str` Original string to compile.
+   * @param  {Object} `opts` Options/settings to pass to engine's compile function.
+   * @return {Function} Returns render function to call that takes `locals` and optional `callback` function.
+   */
+
   engine.compile = function wrappedCompile(str, opts) {
     if (typeof str === 'function') return str;
     opts = opts || {};
@@ -177,6 +194,22 @@ Engines.prototype.decorate = function(engine) {
     }.bind(this);
   };
 
+  /**
+   * Wrapped render function for all engines loaded onto engine-cache.
+   * Compiles and renders strings with given context.
+   *
+   * ```js
+   *  engine.render('<%= foo %>', {foo: 'bar'}, function (err, content) {
+   *    console.log(content);
+   *  });
+   * //=> bar
+   * ```
+   *
+   * @param  {String|Function} `str` Original string to compile or function to use to render.
+   * @param  {Object} `options` Options/locals to pass to compiled function for rendering.
+   * @param {Function} `cb` Callback function that returns `err, content`.
+   */
+
   engine.render = function wrappedRender(str, options, cb) {
     if (typeof options === 'function') {
       cb = options;
@@ -196,6 +229,20 @@ Engines.prototype.decorate = function(engine) {
     }
     return cb(new TypeError('engine-cache `render` expects a string or function.'));
   };
+
+  /**
+   * Wrapped renderSync function for all engines loaded onto engine-cache.
+   * Compiles and renders strings with given context.
+   *
+   * ```js
+   * console.log(engine.renderSync('<%= foo %>', {foo: 'bar'}));
+   * //=> bar
+   * ```
+   *
+   * @param  {String|Function} `str` Original string to compile or function to use to render.
+   * @param  {Object} `options` Options/locals to pass to compiled function for rendering.
+   * @return {String} Returns rendered content.
+   */
 
   engine.renderSync = function wrappedRenderSync(str, options) {
     if (typeof str === 'function') {
