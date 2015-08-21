@@ -1,7 +1,7 @@
 {
   "name": "engine-cache",
   "description": "express.js inspired template-engine manager.",
-  "version": "0.14.0",
+  "version": "0.14.1",
   "homepage": "https://github.com/jonschlinkert/engine-cache",
   "author": {
     "name": "Jon Schlinkert",
@@ -19,10 +19,7 @@
       "url": "https://github.com/doowb"
     }
   ],
-  "repository": {
-    "type": "git",
-    "url": "git://github.com/jonschlinkert/engine-cache.git"
-  },
+  "repository": "jonschlinkert/engine-cache",
   "bugs": {
     "url": "https://github.com/jonschlinkert/engine-cache/issues"
   },
@@ -38,9 +35,10 @@
     "test": "mocha"
   },
   "dependencies": {
-    "async-helpers": "^0.3.0",
-    "extend-shallow": "^1.1.4",
-    "helper-cache": "^0.7.1"
+    "async-helpers": "^0.3.2",
+    "extend-shallow": "^2.0.1",
+    "helper-cache": "^0.7.1",
+    "lazy-cache": "^0.2.3"
   },
   "devDependencies": {
     "consolidate": "^0.12.1",
@@ -48,10 +46,10 @@
     "engine-lodash": "^0.7.1",
     "engines": "^0.4.0",
     "handlebars": "^3.0.2",
-    "lodash": "^3.10.0",
     "mocha": "^2.2.4",
     "should": "^6.0.1",
-    "swig": "^1.4.2"
+    "swig": "^1.4.2",
+    "time-require": "jonschlinkert/time-require"
   },
   "keywords": [
     "assemble",
