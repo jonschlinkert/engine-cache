@@ -1,8 +1,9 @@
 'use strict';
 
-var extend = require('extend-shallow');
-var AsyncHelpers = require('async-helpers');
-var Helpers = require('helper-cache');
+var lazy = require('lazy-cache')(require);
+lazy('extend-shallow', 'extend');
+lazy('async-helpers', 'AsyncHelpers');
+lazy('helper-cache', 'Helpers');
 
 /**
  * Expose `Engines`
@@ -69,9 +70,9 @@ Engines.prototype.setEngine = function (ext, fn, options) {
     engine[key] = fn[key];
   }
 
-  engine.options = extend({}, engine.options, fn.options, options);
-  engine.helpers = new Helpers(options);
-  engine.asyncHelpers = new AsyncHelpers(options);
+  engine.options = lazy.extend({}, engine.options, fn.options, options);
+  engine.helpers = new lazy.Helpers(options);
+  engine.asyncHelpers = new lazy.AsyncHelpers(options);
 
   if (typeof engine.render !== 'function' && typeof engine.renderSync !== 'function') {
     throw new Error('Engines are expected to have a `render` or `renderSync` method.');
@@ -178,7 +179,7 @@ Engines.prototype.decorate = function(engine) {
           return engine.asyncHelpers.resolveIds(content, cb);
         }
       } else {
-        var ctx = extend({}, mergeHelpers.call(this, opts), locals);
+        var ctx = lazy.extend({}, mergeHelpers.call(this, opts), locals);
         if (typeof cb !== 'function') {
           return renderSync(content, ctx);
         } else {
@@ -223,7 +224,7 @@ Engines.prototype.decorate = function(engine) {
     if (typeof str === 'function') {
       return str(options, cb);
     } else if (typeof str === 'string') {
-      var opts = extend({async: true}, options);
+      var opts = lazy.extend({async: true}, options);
       str = this.compile(str, opts);
       return str(opts, cb);
     }
@@ -248,8 +249,8 @@ Engines.prototype.decorate = function(engine) {
     if (typeof str === 'function') {
       return str(options);
     } else if (typeof str === 'string') {
-      var opts = extend({}, options);
-      opts.helpers = extend({}, this.helpers, opts.helpers);
+      var opts = lazy.extend({}, options);
+      opts.helpers = lazy.extend({}, this.helpers, opts.helpers);
       str = this.compile(str, opts);
       return str(opts);
     }
@@ -338,7 +339,7 @@ Engines.prototype.clear = function(ext) {
  */
 
 function mergeHelpers (opts) {
-  extend(this.asyncHelpers.helpers, this.helpers, opts.helpers);
+  lazy.extend(this.asyncHelpers.helpers, this.helpers, opts.helpers);
   opts.helpers = this.asyncHelpers.get({wrap: opts.async});
   return opts;
 }
