@@ -1,12 +1,9 @@
 {
   "name": "engine-cache",
   "description": "express.js inspired template-engine manager.",
-  "version": "0.14.1",
+  "version": "0.15.0",
   "homepage": "https://github.com/jonschlinkert/engine-cache",
-  "author": {
-    "name": "Jon Schlinkert",
-    "url": "https://github.com/jonschlinkert"
-  },
+  "author": "Jon Schlinkert (https://github.com/jonschlinkert)",
   "contributors": [
     {
       "name": "Brian Woodward",
@@ -35,21 +32,23 @@
     "test": "mocha"
   },
   "dependencies": {
-    "async-helpers": "^0.3.2",
+    "async-helpers": "^0.3.4",
     "extend-shallow": "^2.0.1",
-    "helper-cache": "^0.7.1",
+    "helper-cache": "^0.7.2",
     "lazy-cache": "^0.2.3"
   },
   "devDependencies": {
-    "consolidate": "^0.12.1",
+    "consolidate": "^0.13.1",
     "engine-handlebars": "^0.6.1",
-    "engine-lodash": "^0.7.1",
+    "engine-lodash": "^0.8.2",
     "engines": "^0.4.0",
-    "handlebars": "^3.0.2",
-    "mocha": "^2.2.4",
-    "should": "^6.0.1",
+    "handlebars": "^4.0.2",
+    "lodash": "^3.10.1",
+    "mocha": "^2.3.2",
+    "should": "^7.1.0",
     "swig": "^1.4.2",
-    "time-require": "jonschlinkert/time-require"
+    "time-require": "jonschlinkert/time-require",
+    "underscore": "^1.8.3"
   },
   "keywords": [
     "assemble",
@@ -84,5 +83,10 @@
     "underscore",
     "verb",
     "yaml"
-  ]
+  ],
+  "verb": {
+    "related": {
+      "list": ["helper-cache", "async-helpers", "templates", "engines"]
+    }
+  }
 }
