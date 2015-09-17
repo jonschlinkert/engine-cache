@@ -8,6 +8,7 @@
 'use strict';
 
 require('should');
+require('handlebars');
 var Engines = require('..');
 var engines = new Engines();
 var consolidate = require('consolidate');

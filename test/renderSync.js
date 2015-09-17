@@ -8,6 +8,10 @@
 'use strict';
 
 require('should');
+require('lodash');
+require('underscore');
+require('handlebars');
+require('swig');
 var Engines = require('..');
 var engines;
 
