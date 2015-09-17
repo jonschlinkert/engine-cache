@@ -113,7 +113,7 @@ Engines.prototype.setEngine = function (ext, fn, options) {
  */
 
 Engines.prototype.getEngine = function(ext) {
-  if (!ext) return this.cache;
+  if (!ext) return;
   if (ext[0] !== '.') {
     ext = '.' + ext;
   }
