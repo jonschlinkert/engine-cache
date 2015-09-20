@@ -1,13 +1,8 @@
-/*!
- * engine-cache <https://github.com/jonschlinkert/engine-cache>
- *
- * Copyright (c) 2014-2015, Jon Schlinkert.
- * Licensed under the MIT License.
- */
-
 'use strict';
 
+require('mocha');
 require('should');
+var assert = require('assert');
 var Engines = require('..');
 var engines = new Engines();
 var engine = require('engine-handlebars');
@@ -65,6 +60,70 @@ describe('engines compile', function () {
         content.should.equal(expected);
         done();
       });
+    });
+  });    
+
+  it('should render content from a compiled string:', function() {
+    var lodash = require('engine-lodash');
+    var ctx = {name: 'Jon Schlinkert'};
+    engines.setEngine('tmpl', lodash);
+
+    var lodash = engines.getEngine('tmpl');
+    var fn = lodash.compile('<%= name %>');
+    assert(fn(ctx) === 'Jon Schlinkert');
+  });
+
+  it('should handle errors', function() {
+    var lodash = require('engine-lodash');
+    var ctx = {};
+    engines.setEngine('tmpl', lodash);
+
+    var lodash = engines.getEngine('tmpl');
+    try {
+      lodash.compile('<%= name %>');
+    } catch(err) {
+      assert(err.message === 'name is not defined');
+    }
+  });
+
+  it('should directly return a compiled function:', function() {
+    var lodash = require('engine-lodash');
+    var ctx = {name: 'Jon Schlinkert'};
+    engines.setEngine('tmpl', lodash);
+
+    var lodash = engines.getEngine('tmpl');
+    var fn = lodash.compile('<%= name %>');
+    fn = lodash.compile(fn);
+    fn = lodash.compile(fn);
+    fn = lodash.compile(fn);
+    assert(fn(ctx) === 'Jon Schlinkert');
+  });
+
+  it('should allow the returned function to be async:', function(cb) {
+    var lodash = require('engine-lodash');
+    var ctx = {name: 'Jon Schlinkert'};
+    engines.setEngine('tmpl', lodash);
+
+    var lodash = engines.getEngine('tmpl');
+    var fn = lodash.compile('<%= name %>');
+    fn(ctx, function(err, res) {
+      if (err) return cb(err);
+      assert(res === 'Jon Schlinkert');
+      cb();
+    });
+  });
+
+  it('should handle errors in async callback:', function(cb) {
+    var lodash = require('engine-lodash');
+    var ctx = {};
+    engines.setEngine('tmpl', lodash);
+
+    var lodash = engines.getEngine('tmpl');
+    var fn = lodash.compile('<%= name %>');
+    fn(ctx, function(err, res) {
+      if (!err) return cb(new Error('expected an error'));
+      assert(err.message === 'name is not defined');
+      cb();
     });
   });
 });

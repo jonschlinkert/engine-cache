@@ -26,9 +26,9 @@ describe('async helpers', function () {
     });
 
     var hbs = engines.getEngine('hbs');
-    hbs.render('{{upper name}}', {name: 'Jon Schlinkert'}, function (err, content) {
+    hbs.render('{{upper name}}', {name: 'foo'}, function (err, content) {
       if (err) console.log(err);
-      content.should.equal('JON SCHLINKERT');
+      content.should.equal('FOO');
       done();
     });
   });
@@ -41,11 +41,11 @@ describe('async helpers', function () {
     });
 
     var hbs = engines.getEngine('hbs');
-    var ctx = {jon: 'Jon Schlinkert', brian: 'Brian Woodward'};
+    var ctx = {jon: 'foo', brian: 'doowb'};
 
     hbs.render('Jon: {{upper jon}}\nBrian: {{upper brian}}', ctx, function (err, content) {
       if (err) console.log(err);
-      content.should.equal('Jon: JON SCHLINKERT\nBrian: BRIAN WOODWARD');
+      content.should.equal('Jon: FOO\nBrian: DOOWB');
       done();
     });
   });

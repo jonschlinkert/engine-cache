@@ -9,15 +9,40 @@
 
 require('should');
 var assert = require('assert');
+var lodash = require('engine-lodash');
 var Engines = require('..');
 var engines;
 
-describe('engines setEngine', function() {
+describe('engines set', function() {
   beforeEach(function() {
     engines = new Engines();
   });
 
+  describe('errors', function () {
+    it('should throw an error when args are invalid', function () {
+      (function () {
+        engines.setEngine({});
+      }).should.throw('engine-cache "setEngine" expected "engine" to be an object or function.');
+
+      (function () {
+        engines.setEngine(null);
+      }).should.throw('engine-cache "setEngine" expected "engine" to be an object or function.');
+    });
+
+    it('should throw an error when engine is invalid', function () {
+      (function () {
+        engines.setEngine('tmpl', {});
+      }).should.throw('engine-cache "setEngine" expected "engine" to have a render or renderSync method.');
+    });
+  });
+
   describe('.setEngine()', function() {
+    it('should cache the lodash engine.', function() {
+      var ctx = {name: 'Jon Schlinkert'};
+      engines.setEngine('tmpl', lodash);
+      engines.getEngine('tmpl').should.have.property('render');
+    });
+    
     it('should set engines on the `engines` object.', function() {
       engines.setEngine('a', {render: function () {} });
       engines.setEngine('b', {render: function () {} });
