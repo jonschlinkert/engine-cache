@@ -92,6 +92,7 @@
   "verb": {
     "related": {
       "list": [
+        "assemble",
         "helper-cache",
         "async-helpers",
         "templates",
