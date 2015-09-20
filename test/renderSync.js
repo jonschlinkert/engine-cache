@@ -12,47 +12,62 @@ require('lodash');
 require('underscore');
 require('handlebars');
 require('swig');
+var assert = require('assert');
 var Engines = require('..');
-var engines;
+var engines, ctx;
 
 describe('.renderSync()', function () {
   before(function () {
     engines = new Engines();
     engines.load(require('engines'));
+    ctx = {letter: 'b'};
   });
 
-  describe('.getEngine()', function () {
-    it('should render content using a cached engine: [handlebars].', function() {
+  describe('errors', function () {
+    it('should throw an error when args are invalid', function () {
+      var lodash = engines.getEngine('lodash');
+      (function () {
+        lodash.renderSync({});
+      }).should.throw('engine-cache "renderSync" expected "str" to be a string or compiled function.');
+
+      (function () {
+        lodash.renderSync(null);
+      }).should.throw('engine-cache "renderSync" expected "str" to be a string or compiled function.');
+    });
+  });
+
+  describe('cached engines', function () {
+    it('should render content using a cached engine: [handlebars]', function() {
       engines.setEngine('hbs', require('engines').handlebars);
       var hbs = engines.getEngine('hbs');
       var content = hbs.renderSync('a{{letter}}c', {letter: 'b'});
-      content.should.equal('abc');
-    });
-  });
-
-  describe('.load()', function() {
-    var ctx = {letter: 'b'};
-
-    it('should load the cache with engines.', function() {
-      engines.getEngine('lodash').should.have.property('renderSync');
-      engines.getEngine('underscore').should.have.property('renderSync');
-      engines.getEngine('handlebars').should.have.property('renderSync');
-      engines.getEngine('swig').should.have.property('renderSync');
+      assert(content === 'abc');
     });
 
-    it('should render content with a loaded engine: lodash.', function() {
+    it('should render content from a string', function() {
       var lodash = engines.getEngine('lodash');
-      lodash.renderSync('a<%= letter %>c', ctx).should.equal('abc');
+      assert(lodash.renderSync('a<%= letter %>c', ctx) === 'abc');
     });
 
-    it('should render content with a loaded engine: handlebars.', function() {
+    it('should render from a compiled function', function() {
+      var lodash = engines.getEngine('lodash');
+      var fn = lodash.compile('a<%= letter %>c');
+      assert(lodash.renderSync(fn, ctx) === 'abc');
+    });
+
+    it('should render content with handlebars', function() {
       var hbs = engines.getEngine('handlebars');
-      hbs.renderSync('a{{ letter }}c', ctx).should.equal('abc');
+      assert(hbs.renderSync('a{{ letter }}c', ctx) === 'abc');
     });
 
-    it('should render content with a loaded engine: swig.', function() {
+    it('should render content with handlebars', function() {
+      var hbs = engines.getEngine('handlebars');
+      assert(hbs.renderSync('a{{ letter }}c', ctx) === 'abc');
+    });
+
+    it('should render content with swig', function() {
       var hbs = engines.getEngine('swig');
-      hbs.renderSync('a{{ letter }}c', ctx).should.equal('abc');
+      assert(hbs.renderSync('a{{ letter }}c', ctx) === 'abc');
     });
   });
 });
