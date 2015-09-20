@@ -79,9 +79,13 @@ describe('engines compile', function () {
     engines.setEngine('tmpl', lodash);
 
     var lodash = engines.getEngine('tmpl');
-    (function () {
+    try {
       lodash.compile('<%= name %>', 'cause an error');
-    }).should.throw('TypeError: engine-cache "mergeHelpers" Cannot assign to read only property \'helpers\' of cause an error');
+    } catch (err) {
+      assert(err.message.indexOf('Cannot') !== -1);
+      return;
+    }
+    throw new Error('Expected an error');
   });
 
   it('should handle async errors', function(cb) {
