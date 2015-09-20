@@ -58,15 +58,17 @@ Engines.prototype.setEngine = function (ext, fn, opts) {
     engine.renderFile = fn.renderFile || fn.__express;
   }
 
+  for (var key in fn) {
+    engine[key] = fn[key];
+  }
+
   // extend `engine` with any other properties on `fn`
-  utils.extend(engine, fn);
-  engine.options = utils.extend({}, engine.options, fn.opts, opts);
+  engine.options = utils.merge({}, engine.options, fn.opts, opts);
 
   if (typeof engine.render !== 'function' && typeof engine.renderSync !== 'function') {
     msg = expected('setEngine', 'engine').toHave(['render', 'renderSync method']);
     throw new Error(msg);
   }
-
 
   // create helper caches for the engine
   var AsyncHelpers = this.options.AsyncHelpers || utils.AsyncHelpers;
@@ -140,11 +142,17 @@ Engines.prototype.decorate = function(engine) {
    * @return {Object} Options object with merged helpers
    */
 
-  function mergeHelpers(opts) {
+  function mergeHelpers(engine, opts) {
     /*jshint validthis:true */
     try {
-      utils.extend(this.asyncHelpers.helpers, this.helpers, opts.helpers);
-      opts.helpers = this.asyncHelpers.get({wrap: opts.async});
+      var helpers = utils.merge({}, engine.helpers, opts.helpers);
+      if (typeof helpers === 'object') {
+        for (var key in helpers) {
+          engine.asyncHelpers.set(key, helpers[key]);
+        }
+      }
+
+      opts.helpers = engine.asyncHelpers.get({wrap: opts.async});
       return opts;
     } catch(err) {
       err.message = error('mergeHelpers', err.message);
@@ -175,9 +183,12 @@ Engines.prototype.decorate = function(engine) {
     }
 
     if (!opts) opts = {};
-    var ctx = mergeHelpers.call(this, opts);
-    var compiled = compile ? compile(str, ctx) : null;
     var self = this;
+
+    var helpers = mergeHelpers(engine, opts);
+    var compiled = compile
+      ? compile(str, helpers)
+      : null;
 
     return function (locals, cb) {
       if (typeof locals === 'function') {
@@ -193,8 +204,8 @@ Engines.prototype.decorate = function(engine) {
         }
       }
 
-      ctx = mergeHelpers.call(self, opts);
-      var data = utils.extend({}, ctx, locals);
+      helpers = mergeHelpers(engine, opts);
+      var data = utils.merge({}, locals, helpers);
 
       if (typeof cb !== 'function') {
         return renderSync(str, data);
@@ -276,7 +287,7 @@ Engines.prototype.decorate = function(engine) {
       throw new TypeError(msg);
     }
 
-    var opts = utils.extend({}, options);
+    var opts = utils.merge({}, options);
     opts.helpers = utils.merge({}, this.helpers, opts.helpers);
     str = this.compile(str, opts);
     return str(opts);

@@ -34,7 +34,6 @@
   },
   "dependencies": {
     "async-helpers": "^0.3.4",
-    "extend-shallow": "^2.0.1",
     "helper-cache": "^0.7.2",
     "lazy-cache": "^0.2.3",
     "mixin-deep": "^1.1.3"
