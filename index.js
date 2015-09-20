@@ -67,8 +67,6 @@ Engines.prototype.setEngine = function (ext, fn, opts) {
     throw new Error(msg);
   }
 
-  engine.name = engine.name || engine.options.name || stripExt(ext);
-  engine.options.ext = formatExt(ext);
 
   // create helper caches for the engine
   var AsyncHelpers = this.options.AsyncHelpers || utils.AsyncHelpers;
@@ -76,6 +74,9 @@ Engines.prototype.setEngine = function (ext, fn, opts) {
 
   engine.helpers = new Helpers(opts);
   engine.asyncHelpers = new AsyncHelpers(opts);
+
+  engine.name = engine.name || engine.options.name || stripExt(ext);
+  engine.options.ext = formatExt(ext);
 
   // decorate wrapped methods for async helper handling
   this.decorate(engine);
@@ -104,7 +105,14 @@ Engines.prototype.setEngine = function (ext, fn, opts) {
 Engines.prototype.getEngine = function(ext) {
   if (!ext) return;
   var engine = this.cache[formatExt(ext)];
-  return engine || this.getEngine('*');
+  if (typeof engine === 'undefined' && this.options.defaultEngine) {
+    if (typeof this.options.defaultEngine === 'string') {
+      return this.cache[formatExt(this.options.defaultEngine)];
+    } else {
+      return this.options.defaultEngine;
+    }
+  }
+  return engine;
 };
 
 /**
@@ -152,7 +160,7 @@ Engines.prototype.decorate = function(engine) {
    *
    * ```js
    * var fn = engine.compile('<%= upper(foo) %>', {imports: {'upper': upper}});
-   * console.log(fn({foo: 'bar'})));
+   * fn({foo: 'bar'}));
    * //=> BAR
    * ```
    *
@@ -172,6 +180,11 @@ Engines.prototype.decorate = function(engine) {
     var self = this;
 
     return function (locals, cb) {
+      if (typeof locals === 'function') {
+        cb = locals;
+        locals = {};
+      }
+
       if (typeof compiled === 'function') {
         try {
           str = compiled(locals);
@@ -181,7 +194,8 @@ Engines.prototype.decorate = function(engine) {
       }
 
       ctx = mergeHelpers.call(self, opts);
-      var data = utils.merge({}, ctx, locals);
+      var data = utils.extend({}, ctx, locals);
+
       if (typeof cb !== 'function') {
         return renderSync(str, data);
       }
@@ -199,9 +213,8 @@ Engines.prototype.decorate = function(engine) {
    *
    * ```js
    *  engine.render('<%= foo %>', {foo: 'bar'}, function (err, content) {
-   *    console.log(content);
+   *    //=> bar
    *  });
-   * //=> bar
    * ```
    *
    * @param  {String|Function} `str` Original string to compile or function to use to render.
@@ -221,9 +234,11 @@ Engines.prototype.decorate = function(engine) {
       throw new TypeError(msg);
     }
 
+
     if (typeof str === 'function') {
       fn = str;
-      return fn(opts, cb);
+      fn(opts, cb);
+      return;
     }
 
     if (typeof str === 'string') {
@@ -241,7 +256,7 @@ Engines.prototype.decorate = function(engine) {
    * Compiles and renders strings with given context.
    *
    * ```js
-   * console.log(engine.renderSync('<%= foo %>', {foo: 'bar'}));
+   * engine.renderSync('<%= foo %>', {foo: 'bar'});
    * //=> bar
    * ```
    *
@@ -371,7 +386,8 @@ function arrayify(val) {
 }
 
 function formatExt(ext) {
-  if (ext.charAt(0) !== '.') {
+  if (!ext) return;
+  if (ext && ext.charAt(0) !== '.') {
     return '.' + ext;
   }
   return ext;

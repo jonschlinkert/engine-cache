@@ -29,9 +29,11 @@ describe('engines get', function() {
       assert(engines.getEngine() === undefined);
     });
 
-    it('should get a default if defined:', function() {
+    it('should use a default if defined:', function() {
       var ctx = {name: 'Jon Schlinkert'};
-      engines.setEngine('*', lodash);
+      engines.options.defaultEngine = '*';
+      engines.setEngine('*', require('engine-lodash'));
+      
       var engine = engines.getEngine('tmpl');
       assert(typeof engine.render === 'function');
     });
