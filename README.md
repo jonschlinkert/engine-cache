@@ -49,7 +49,7 @@ var consolidate = require('consolidate')
 engines.setEngine('hbs', consolidate.handlebars)
 ```
 
-### [.getEngine](index.js#L105)
+### [.getEngine](index.js#L107)
 
 Return the engine stored by `ext`. If no `ext` is passed, undefined is returned.
 
@@ -68,7 +68,7 @@ engine.getEngine('hbs');
 // => {render: [function], renderFile: [function]}
 ```
 
-### [.load](index.js#L300)
+### [.load](index.js#L311)
 
 Load an object of engines onto the `cache`. Mostly useful for testing, but exposed as a public method.
 
@@ -83,7 +83,7 @@ Load an object of engines onto the `cache`. Mostly useful for testing, but expos
 engines.load(require('consolidate'))
 ```
 
-### [.helpers](index.js#L330)
+### [.helpers](index.js#L341)
 
 Get and set helpers for the given `ext` (engine). If no `ext` is passed, the entire helper cache is returned.
 
