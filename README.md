@@ -107,6 +107,7 @@ helpers.getEngineHelper();
 
 ## Related
 
+* [assemble](https://www.npmjs.com/package/assemble): Static site generator for Grunt.js, Yeoman and Node.js. Used by Zurb Foundation, Zurb Ink, H5BP/Effeckt,… [more](https://www.npmjs.com/package/assemble) | [homepage](http://assemble.io)
 * [async-helpers](https://www.npmjs.com/package/async-helpers): Use async helpers in templates with engines that typically only handle sync helpers. Handlebars and… [more](https://www.npmjs.com/package/async-helpers) | [homepage](https://github.com/doowb/async-helpers)
 * [engines](https://www.npmjs.com/package/engines): Template engine library with fast, synchronous rendering, based on consolidate. | [homepage](https://github.com/assemble/engines)
 * [helper-cache](https://www.npmjs.com/package/helper-cache): Easily register and get helper functions to be passed to any template engine or node.js… [more](https://www.npmjs.com/package/helper-cache) | [homepage](https://github.com/jonschlinkert/helper-cache)
