@@ -33,7 +33,15 @@ describe('engines get', function() {
       var ctx = {name: 'Jon Schlinkert'};
       engines.options.defaultEngine = '*';
       engines.setEngine('*', require('engine-lodash'));
-      
+
+      var engine = engines.getEngine('tmpl');
+      assert(typeof engine.render === 'function');
+    });
+
+    it('should use a default as a function if defined:', function() {
+      var ctx = {name: 'Jon Schlinkert'};
+      engines.options.defaultEngine = require('engine-lodash');
+
       var engine = engines.getEngine('tmpl');
       assert(typeof engine.render === 'function');
     });

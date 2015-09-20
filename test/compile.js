@@ -61,7 +61,7 @@ describe('engines compile', function () {
         done();
       });
     });
-  });    
+  });
 
   it('should render content from a compiled string:', function() {
     var lodash = require('engine-lodash');
@@ -79,11 +79,32 @@ describe('engines compile', function () {
     engines.setEngine('tmpl', lodash);
 
     var lodash = engines.getEngine('tmpl');
-    try {
-      lodash.compile('<%= name %>');
-    } catch(err) {
-      assert(err.message === 'name is not defined');
-    }
+    (function () {
+      lodash.compile('<%= name %>', 'cause an error');
+    }).should.throw('TypeError: engine-cache "mergeHelpers" Cannot assign to read only property \'helpers\' of cause an error');
+  });
+
+  it('should handle async errors', function(cb) {
+    var lodash = require('engine-lodash');
+    engines.setEngine('tmpl', function (str, ctx, callback) {
+      try {
+        var fn = lodash.compile(str);
+        var res = fn(ctx);
+        return callback(null, res);
+      } catch (err) {
+        return callback(err);
+      }
+    });
+
+    var tmpl = engines.getEngine('tmpl');
+    var fn = tmpl.compile('<%= name %>');
+    fn(function (err, res) {
+      if (err) {
+        assert.equal(err.message, 'name is not defined');
+        return cb();
+      }
+      cb(new Error('Expected an error.'));
+    });
   });
 
   it('should directly return a compiled function:', function() {
@@ -109,6 +130,19 @@ describe('engines compile', function () {
     fn(ctx, function(err, res) {
       if (err) return cb(err);
       assert(res === 'Jon Schlinkert');
+      cb();
+    });
+  });
+
+  it('should allow the returned function to be async and not require a context:', function(cb) {
+    var lodash = require('engine-lodash');
+    engines.setEngine('tmpl', lodash);
+
+    var lodash = engines.getEngine('tmpl');
+    var fn = lodash.compile('No context required');
+    fn(function(err, res) {
+      if (err) return cb(err);
+      assert(res === 'No context required');
       cb();
     });
   });

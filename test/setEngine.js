@@ -42,7 +42,7 @@ describe('engines set', function() {
       engines.setEngine('tmpl', lodash);
       engines.getEngine('tmpl').should.have.property('render');
     });
-    
+
     it('should set engines on the `engines` object.', function() {
       engines.setEngine('a', {render: function () {} });
       engines.setEngine('b', {render: function () {} });
@@ -54,9 +54,9 @@ describe('engines set', function() {
 
     it('should normalize engine extensions to have a dot.', function() {
       engines.setEngine('a', {render: function () {} });
-      engines.setEngine('b', {render: function () {} });
+      engines.setEngine('.b', {render: function () {} });
       engines.setEngine('c', {render: function () {} });
-      engines.setEngine('d', {render: function () {} });
+      engines.setEngine('.d', {render: function () {} });
 
       engines.cache.should.have.properties('.a', '.b', '.c', '.d');
     });

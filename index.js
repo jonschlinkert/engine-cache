@@ -87,7 +87,7 @@ Engines.prototype.setEngine = function (ext, fn, opts) {
 
 /**
  * Return the engine stored by `ext`. If no `ext`
- * is passed, the entire cache is returned.
+ * is passed, undefined is returned.
  *
  * ```js
  * var consolidate = require('consolidate')
