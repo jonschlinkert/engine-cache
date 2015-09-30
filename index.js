@@ -205,7 +205,12 @@ Engines.prototype.decorate = function(engine) {
       }
 
       helpers = mergeHelpers(engine, opts);
-      var data = utils.merge({}, locals, helpers);
+      var data = {};
+      if (opts && typeof opts.mergeFn === 'function') {
+        data = otps.mergeFn(helpers, locals);
+      } else {
+        data = utils.extend({}, locals, helpers);
+      }
 
       if (typeof cb !== 'function') {
         return renderSync(str, data);
