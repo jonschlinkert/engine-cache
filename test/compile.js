@@ -151,6 +151,22 @@ describe('engines compile', function () {
     });
   });
 
+  it('should handle errors in sync render:', function(cb) {
+    var lodash = require('engine-lodash');
+    var ctx = {};
+    engines.setEngine('tmpl', lodash);
+
+    var lodash = engines.getEngine('tmpl');
+    var fn = lodash.compile('<%= name %>');
+    try {
+      var res = fn(ctx);
+      cb(new Error('expected an error'));
+    } catch (err) {
+      assert.equal(err.message, 'name is not defined');
+      cb();
+    }
+  });
+
   it('should handle errors in async callback:', function(cb) {
     var lodash = require('engine-lodash');
     var ctx = {};
