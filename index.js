@@ -142,9 +142,15 @@ Engines.prototype.decorate = function(engine) {
    * @return {Object} Options object with merged helpers
    */
 
-  function mergeHelpers(engine, opts) {
+  function mergeHelpers(engine, options) {
     /*jshint validthis:true */
+    if (typeof options !== 'object') {
+      var msg = expected('mergeHelpers', 'options').toBe('object');
+      throw new TypeError(msg);
+    }
+
     try {
+      var opts = utils.merge({}, options);
       var helpers = utils.merge({}, engine.helpers, opts.helpers);
       if (typeof helpers === 'object') {
         for (var key in helpers) {
@@ -262,9 +268,15 @@ Engines.prototype.decorate = function(engine) {
     }
 
     if (typeof str === 'string') {
+      var tmp = opts.async;
       opts.async = true;
       fn = this.compile(str, opts);
-      return fn(opts, cb);
+
+      return fn(opts, function(err, content) {
+        opts.async = tmp;
+        if (err) return cb(err);
+        cb(null, content);
+      });
     }
 
     msg = expected('render', 'str').toBe(['string', 'compiled function']);
