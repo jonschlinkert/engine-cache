@@ -49,4 +49,28 @@ describe('async helpers', function () {
       done();
     });
   });
+
+  it('should render content multiple times as async then sync.', function(done) {
+    engines.setEngine('tmpl', require('engine-lodash'));
+    var engine = engines.getEngine('tmpl');
+    var ctx = {
+      jon: 'foo',
+      brian: 'doowb',
+      helpers: {
+        upper: function (str, options) {
+          return str.toUpperCase();
+        }
+      }
+    };
+
+    engine.render('Jon: <%= upper(jon) %>\nBrian: <%= upper(brian) %>', ctx, function (err, content) {
+      if (err) console.log(err);
+      content.should.equal('Jon: FOO\nBrian: DOOWB');
+
+      var fn = engine.compile('Jon: <%= upper(jon) %>\nBrian: <%= upper(brian) %>', ctx);
+      content = fn(ctx);
+      content.should.equal('Jon: FOO\nBrian: DOOWB');
+      done();
+    });
+  });
 });
