@@ -82,7 +82,7 @@ describe('engines compile', function () {
     try {
       lodash.compile('<%= name %>', 'cause an error');
     } catch (err) {
-      assert(err.message.indexOf('Cannot') !== -1);
+      assert.equal(err.message, 'engine-cache "mergeHelpers" expected "options" to be an object.');
       return;
     }
     throw new Error('Expected an error');
