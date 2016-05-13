@@ -200,7 +200,11 @@ Engines.prototype.decorate = function(engine) {
         try {
           str = compiled(locals);
         } catch (err) {
-          return cb(err);
+          if (typeof cb === 'function') {
+            cb(err);
+            return;
+          }
+          throw err;
         }
       }
 
