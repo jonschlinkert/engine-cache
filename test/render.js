@@ -6,28 +6,28 @@ var Engines = require('..');
 var engines = new Engines();
 var consolidate = require('consolidate');
 
-describe('engines render', function () {
-  before(function () {
+describe('engines render', function() {
+  before(function() {
     engines = new Engines();
   });
 
-  describe('errors', function () {
-    it('should throw an error when no callback is passed', function () {
+  describe('errors', function() {
+    it('should throw an error when no callback is passed', function() {
       engines.setEngine('tmpl', require('engine-lodash'));
       var tmpl = engines.getEngine('tmpl');
 
-      (function () {
+      (function() {
         tmpl.render({});
       }).should.throw('engine-cache "render" expected "callback" to be a function.');
     });
   });
 
-  describe('.render()', function () {
+  describe('.render()', function() {
     it('should error when bad args are passed.', function(done) {
       engines.setEngine('hbs', consolidate.handlebars);
       var hbs = engines.getEngine('hbs');
 
-      hbs.render(null, function (err, content) {
+      hbs.render(null, function(err, content) {
         if (!err) return done(new Error('Expected an error'));
         assert(err.message === 'engine-cache "render" expected "str" to be a string or compiled function.');
         done();
@@ -38,7 +38,7 @@ describe('engines render', function () {
       engines.setEngine('hbs', consolidate.handlebars);
       var hbs = engines.getEngine('hbs');
 
-      hbs.render('{{name}}', {name: 'Jon Schlinkert'}, function (err, content) {
+      hbs.render('{{name}}', {name: 'Jon Schlinkert'}, function(err, content) {
         if (err) return done(err);
         assert(content === 'Jon Schlinkert');
         done();
@@ -49,7 +49,7 @@ describe('engines render', function () {
       engines.setEngine('tmpl', require('engine-lodash'));
       var tmpl = engines.getEngine('tmpl');
 
-      tmpl.render('<%= foo %>', function (err, content) {
+      tmpl.render('<%= foo %>', function(err, content) {
         if (!err) return done(new Error('Expected an error'));
         assert(err.message === 'foo is not defined');
         done();
@@ -60,7 +60,7 @@ describe('engines render', function () {
       engines.setEngine('tmpl', require('engine-lodash'));
       var tmpl = engines.getEngine('tmpl');
 
-      tmpl.render('<%= upper(foo) %>', function (err, content) {
+      tmpl.render('<%= upper(foo) %>', function(err, content) {
         if (!err) return done(new Error('Expected an error'));
         assert(err.message === 'upper is not defined');
         done();

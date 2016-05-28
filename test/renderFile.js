@@ -16,8 +16,8 @@ var assert = require('assert');
 var Engines = require('..');
 var engines, ctx;
 
-describe('.renderFile()', function () {
-  before(function () {
+describe('.renderFile()', function() {
+  before(function() {
     engines = new Engines();
     engines.setEngine('tmpl', require('engine-lodash'));
     ctx = {name: 'Lo-Dash'};
@@ -25,7 +25,7 @@ describe('.renderFile()', function () {
 
   it('should render content from a file', function(cb) {
     var lodash = engines.getEngine('tmpl');
-    lodash.renderFile('test/fixtures/name.tmpl', ctx, function (err, res) {
+    lodash.renderFile('test/fixtures/name.tmpl', ctx, function(err, res) {
       if (err) return cb(err);
       assert(res === 'Lo-Dash');
       cb();
@@ -41,7 +41,7 @@ describe('.renderFile()', function () {
 
     var engine = engines.getEngine('tmpl');
 
-    engine.__express('test/fixtures/name.tmpl', ctx, function (err, res) {
+    engine.__express('test/fixtures/name.tmpl', ctx, function(err, res) {
       if (err) return cb(err);
       assert(res === 'Lo-Dash');
       cb();

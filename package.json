@@ -4,17 +4,11 @@
   "version": "0.16.2",
   "homepage": "https://github.com/jonschlinkert/engine-cache",
   "author": "Jon Schlinkert (https://github.com/jonschlinkert)",
-  "contributors": [
-    {
-      "name": "Brian Woodward",
-      "url": "https://github.com/doowb"
-    }
-  ],
   "maintainers": [
-    {
-      "name": "Brian Woodward",
-      "url": "https://github.com/doowb"
-    }
+    "Brian Woodward (https://github.com/doowb)"
+  ],
+  "contributors": [
+    "Brian Woodward (https://github.com/doowb)"
   ],
   "repository": "jonschlinkert/engine-cache",
   "bugs": {
@@ -94,10 +88,10 @@
     "related": {
       "list": [
         "assemble",
-        "helper-cache",
         "async-helpers",
-        "templates",
-        "engines"
+        "engines",
+        "helper-cache",
+        "templates"
       ]
     }
   }

@@ -6,7 +6,6 @@ var lodash = require('engine-lodash');
 var Engines = require('..');
 var engines;
 
-
 describe('engines get', function() {
   beforeEach(function() {
     engines = new Engines();
@@ -14,10 +13,10 @@ describe('engines get', function() {
 
   describe('.getEngine()', function() {
     it('should get the given engine from the `cache`.', function() {
-      engines.setEngine('a', {render: function () {} });
-      engines.setEngine('b', {render: function () {} });
-      engines.setEngine('c', {render: function () {} });
-      engines.setEngine('d', {render: function () {} });
+      engines.setEngine('a', {render: function() {} });
+      engines.setEngine('b', {render: function() {} });
+      engines.setEngine('c', {render: function() {} });
+      engines.setEngine('d', {render: function() {} });
 
       engines.getEngine('a').should.have.property('render');
       engines.getEngine('b').should.have.property('render');
@@ -52,7 +51,7 @@ describe('engines get', function() {
       engines.setEngine('tmpl', lodash);
 
       var lodash = engines.getEngine('tmpl');
-      lodash.render('<%= name %>', ctx, function (err, content) {
+      lodash.render('<%= name %>', ctx, function(err, content) {
         content.should.equal('Jon Schlinkert');
         done();
       });

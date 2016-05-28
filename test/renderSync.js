@@ -16,27 +16,27 @@ var assert = require('assert');
 var Engines = require('..');
 var engines, ctx;
 
-describe('.renderSync()', function () {
-  before(function () {
+describe('.renderSync()', function() {
+  before(function() {
     engines = new Engines();
     engines.load(require('engines'));
     ctx = {letter: 'b'};
   });
 
-  describe('errors', function () {
-    it('should throw an error when args are invalid', function () {
+  describe('errors', function() {
+    it('should throw an error when args are invalid', function() {
       var lodash = engines.getEngine('lodash');
-      (function () {
+      (function() {
         lodash.renderSync({});
       }).should.throw('engine-cache "renderSync" expected "str" to be a string or compiled function.');
 
-      (function () {
+      (function() {
         lodash.renderSync(null);
       }).should.throw('engine-cache "renderSync" expected "str" to be a string or compiled function.');
     });
   });
 
-  describe('cached engines', function () {
+  describe('cached engines', function() {
     it('should render content using a cached engine: [handlebars]', function() {
       engines.setEngine('hbs', require('engines').handlebars);
       var hbs = engines.getEngine('hbs');

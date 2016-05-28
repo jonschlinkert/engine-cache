@@ -1,6 +1,16 @@
-var lazy = require('lazy-cache')(require);
-lazy('extend-shallow', 'extend');
-lazy('mixin-deep', 'merge');
-lazy('async-helpers', 'AsyncHelpers');
-lazy('helper-cache', 'Helpers');
-module.exports = lazy;
+'use strict';
+
+var utils = require('lazy-cache')(require);
+var fn = require;
+require = utils;
+require('extend-shallow', 'extend');
+require('mixin-deep', 'merge');
+require('async-helpers', 'AsyncHelpers');
+require('helper-cache', 'Helpers');
+require = fn;
+
+/**
+ * Expose `utils`
+ */
+
+module.exports = utils;

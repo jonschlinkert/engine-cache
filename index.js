@@ -38,7 +38,7 @@ function Engines(engines, options) {
  * @api public
  */
 
-Engines.prototype.setEngine = function (ext, fn, opts) {
+Engines.prototype.setEngine = function(ext, fn, opts) {
   if (opts && isEngine(opts)) {
     var temp = fn;
     fn = opts;
@@ -160,7 +160,7 @@ Engines.prototype.decorate = function(engine) {
 
       opts.helpers = engine.asyncHelpers.get({wrap: opts.async});
       return opts;
-    } catch(err) {
+    } catch (err) {
       err.message = error('mergeHelpers', err.message);
       throw new Error(err);
     }
@@ -189,14 +189,12 @@ Engines.prototype.decorate = function(engine) {
     }
 
     if (!opts) opts = {};
-    var self = this;
-
     var helpers = mergeHelpers(engine, opts);
     var compiled = compile
       ? compile(str, helpers)
       : null;
 
-    return function (locals, cb) {
+    return function(locals, cb) {
       if (typeof locals === 'function') {
         cb = locals;
         locals = {};
@@ -217,7 +215,7 @@ Engines.prototype.decorate = function(engine) {
       helpers = mergeHelpers(engine, opts);
       var data = {};
       if (opts && typeof opts.mergeFn === 'function') {
-        data = otps.mergeFn(helpers, locals);
+        data = opts.mergeFn(helpers, locals);
       } else {
         data = utils.extend({}, locals, helpers);
       }
@@ -226,7 +224,7 @@ Engines.prototype.decorate = function(engine) {
         return renderSync(str, data);
       }
 
-      return render(str, data, function (err, str) {
+      return render(str, data, function(err, str) {
         if (err) return cb(err);
         return engine.asyncHelpers.resolveIds(str, cb);
       });
@@ -238,7 +236,7 @@ Engines.prototype.decorate = function(engine) {
    * Compiles and renders strings with given context.
    *
    * ```js
-   *  engine.render('<%= foo %>', {foo: 'bar'}, function (err, content) {
+   *  engine.render('<%= foo %>', {foo: 'bar'}, function(err, content) {
    *    //=> bar
    *  });
    * ```
@@ -259,7 +257,6 @@ Engines.prototype.decorate = function(engine) {
       msg = expected('render', 'callback').toBe('function');
       throw new TypeError(msg);
     }
-
 
     if (typeof str === 'function') {
       fn = str;
@@ -367,7 +364,7 @@ Engines.prototype.helpers = function(ext) {
  * Decorate a custom inspect function onto the engine.
  */
 
-Engines.prototype.engineInspect = function (engine) {
+Engines.prototype.engineInspect = function(engine) {
   var inspect = ['"' + engine.name + '"'];
   inspect.push('<ext "' + engine.options.ext + '">');
 
@@ -394,16 +391,16 @@ function error(method, msg) {
 function expected(method, prop) {
   var res = {};
   function msg(type, prop, args) {
-    args = arrayify(args).map(function (arg, i) {
+    args = arrayify(args).map(function(arg, i) {
       if (i === 0) return article(arg) + ' ' + arg;
       return arg;
     }).join(' or ');
     return 'expected "' + prop + '" to ' + type + ' ' + args + '.';
   }
-  res.toBe = function (args) {
+  res.toBe = function(args) {
     return error(method, msg('be', prop, args));
   };
-  res.toHave = function (args) {
+  res.toHave = function(args) {
     return error(method, msg('have', prop, args));
   };
   return res;

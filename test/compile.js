@@ -7,13 +7,12 @@ var Engines = require('..');
 var engines = new Engines();
 var engine = require('engine-handlebars');
 
-
-describe('engines compile', function () {
-  before(function () {
+describe('engines compile', function() {
+  before(function() {
     engines = new Engines();
   });
 
-  describe('.compile()', function () {
+  describe('.compile()', function() {
     it('should compile content with a cached engine: [handlebars].', function(done) {
       engines.setEngine('hbs', engine);
       var hbs = engines.getEngine('hbs');
@@ -25,8 +24,8 @@ describe('engines compile', function () {
           'c': 'This is C: {{upper partials.c}} - {{lower helpers.c}}'
         },
         helpers: {
-          'upper': function (str) { return str.toUpperCase(); },
-          'lower': function (str) { return str.toLowerCase(); }
+          'upper': function(str) { return str.toUpperCase(); },
+          'lower': function(str) { return str.toLowerCase(); }
         }
       };
 
@@ -56,7 +55,7 @@ describe('engines compile', function () {
       ].join('\n');
 
       var fn = hbs.compile(template, settings);
-      hbs.render(fn, context, function (err, content) {
+      hbs.render(fn, context, function(err, content) {
         content.should.equal(expected);
         done();
       });
@@ -90,7 +89,7 @@ describe('engines compile', function () {
 
   it('should handle async errors', function(cb) {
     var lodash = require('engine-lodash');
-    engines.setEngine('tmpl', function (str, ctx, callback) {
+    engines.setEngine('tmpl', function(str, ctx, callback) {
       try {
         var fn = lodash.compile(str);
         var res = fn(ctx);
@@ -102,7 +101,7 @@ describe('engines compile', function () {
 
     var tmpl = engines.getEngine('tmpl');
     var fn = tmpl.compile('<%= name %>');
-    fn(function (err, res) {
+    fn(function(err, res) {
       if (err) {
         assert.equal(err.message, 'name is not defined');
         return cb();
