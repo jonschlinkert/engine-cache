@@ -7,7 +7,6 @@
 
 'use strict';
 
-require('should');
 var assert = require('assert');
 var Engines = require('..');
 var engines;
@@ -25,7 +24,7 @@ describe('engines helpers', function() {
     it('should add a helper to the `cache` for the given engine.', function() {
       var helpers = engines.helpers('abc');
       helpers.addHelper('foo', function() {});
-      assert(typeof helpers.getHelper('foo') === 'function');
+      assert.equal(typeof helpers.getHelper('foo'), 'function');
     });
 
     it('should set helpers on the given engine.', function() {
@@ -34,7 +33,7 @@ describe('engines helpers', function() {
       engine.helpers.addHelper('b', function b() {})
       engine.helpers.addHelper('c', function c() {})
 
-      assert(Object.keys(engine.helpers).length === 3);
+      assert.equal(Object.keys(engine.helpers).length, 3);
     });
 
     it('should get helpers from the given engine.', function() {
@@ -43,12 +42,12 @@ describe('engines helpers', function() {
       engine.helpers.addHelper('b', function b() {})
       engine.helpers.addHelper('c', function c() {})
       var helper = engine.helpers.getHelper('a');
-      assert(typeof helper === 'function');
-      assert(helper.name === 'a');
+      assert.equal(typeof helper, 'function');
+      assert.equal(helper.name, 'a');
     });
 
     it('should use helpers added directly to the engine.', function() {
-      engines.setEngine('tmpl', require('engine-lodash'));
+      engines.setEngine('tmpl', require('engine-base'));
       var engine = engines.getEngine('tmpl');
 
       engine.helpers.addHelper('upper', function(str) {
@@ -57,7 +56,7 @@ describe('engines helpers', function() {
 
       var fn = engine.compile('<%= upper(name) %>');
       fn({name: 'foo'})
-      assert(fn({name: 'foo'}) === 'FOO');
+      assert.equal(fn({name: 'foo'}), 'FOO');
     });
   });
 });

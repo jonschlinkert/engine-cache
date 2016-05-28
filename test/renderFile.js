@@ -7,7 +7,6 @@
 
 'use strict';
 
-require('should');
 require('lodash');
 require('underscore');
 require('handlebars');
@@ -19,7 +18,7 @@ var engines, ctx;
 describe('.renderFile()', function() {
   before(function() {
     engines = new Engines();
-    engines.setEngine('tmpl', require('engine-lodash'));
+    engines.setEngine('tmpl', require('engine-base'));
     ctx = {name: 'Lo-Dash'};
   });
 
@@ -27,7 +26,7 @@ describe('.renderFile()', function() {
     var lodash = engines.getEngine('tmpl');
     lodash.renderFile('test/fixtures/name.tmpl', ctx, function(err, res) {
       if (err) return cb(err);
-      assert(res === 'Lo-Dash');
+      assert.equal(res, 'Lo-Dash');
       cb();
     });
   });
@@ -43,7 +42,7 @@ describe('.renderFile()', function() {
 
     engine.__express('test/fixtures/name.tmpl', ctx, function(err, res) {
       if (err) return cb(err);
-      assert(res === 'Lo-Dash');
+      assert.equal(res, 'Lo-Dash');
       cb();
     });
   });

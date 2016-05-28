@@ -1,7 +1,6 @@
 'use strict';
 
 require('mocha');
-require('should');
 var assert = require('assert');
 var Engines = require('..');
 var engines = new Engines();
@@ -13,7 +12,7 @@ describe('engines compile', function() {
   });
 
   describe('.compile()', function() {
-    it('should compile content with a cached engine: [handlebars].', function(done) {
+    it('should compile content with a cached engine: [handlebars].', function(cb) {
       engines.setEngine('hbs', engine);
       var hbs = engines.getEngine('hbs');
 
@@ -56,109 +55,104 @@ describe('engines compile', function() {
 
       var fn = hbs.compile(template, settings);
       hbs.render(fn, context, function(err, content) {
-        content.should.equal(expected);
-        done();
+        if (err) return cb(err);
+        assert.equal(content, expected);
+        cb();
       });
     });
   });
 
   it('should render content from a compiled string:', function() {
-    var lodash = require('engine-lodash');
+    var base = require('engine-base');
     var ctx = {name: 'Jon Schlinkert'};
-    engines.setEngine('tmpl', lodash);
+    engines.setEngine('tmpl', base);
 
-    var lodash = engines.getEngine('tmpl');
-    var fn = lodash.compile('<%= name %>');
-    assert(fn(ctx) === 'Jon Schlinkert');
+    var base = engines.getEngine('tmpl');
+    var fn = base.compile('<%= name %>');
+    assert.equal(fn(ctx), 'Jon Schlinkert');
   });
 
-  it('should handle errors', function() {
-    var lodash = require('engine-lodash');
-    var ctx = {};
-    engines.setEngine('tmpl', lodash);
+  it('should handle errors', function(cb) {
+    var base = require('engine-base');
+    engines.setEngine('tmpl', base);
 
-    var lodash = engines.getEngine('tmpl');
+    var base = engines.getEngine('tmpl');
     try {
-      lodash.compile('<%= name %>', 'cause an error');
+      base.compile('<%= name %>', 'cause an error');
+      cb(new Error('expected an error'));
     } catch (err) {
-      assert.equal(err.message, 'engine-cache "mergeHelpers" expected "options" to be an object.');
-      return;
+      assert.equal(err.message, 'expected an object');
+      cb();
     }
-    throw new Error('Expected an error');
   });
 
   it('should handle async errors', function(cb) {
-    var lodash = require('engine-lodash');
-    engines.setEngine('tmpl', function(str, ctx, callback) {
+    var base = require('engine-base');
+    engines.setEngine('tmpl', function(str, ctx, cb) {
       try {
-        var fn = lodash.compile(str);
-        var res = fn(ctx);
-        return callback(null, res);
+        cb(null, base.compile(str)(ctx));
       } catch (err) {
-        return callback(err);
+        cb(err);
       }
     });
 
     var tmpl = engines.getEngine('tmpl');
     var fn = tmpl.compile('<%= name %>');
     fn(function(err, res) {
-      if (err) {
-        assert.equal(err.message, 'name is not defined');
-        return cb();
-      }
-      cb(new Error('Expected an error.'));
-    });
-  });
-
-  it('should directly return a compiled function:', function() {
-    var lodash = require('engine-lodash');
-    var ctx = {name: 'Jon Schlinkert'};
-    engines.setEngine('tmpl', lodash);
-
-    var lodash = engines.getEngine('tmpl');
-    var fn = lodash.compile('<%= name %>');
-    fn = lodash.compile(fn);
-    fn = lodash.compile(fn);
-    fn = lodash.compile(fn);
-    assert(fn(ctx) === 'Jon Schlinkert');
-  });
-
-  it('should allow the returned function to be async:', function(cb) {
-    var lodash = require('engine-lodash');
-    var ctx = {name: 'Jon Schlinkert'};
-    engines.setEngine('tmpl', lodash);
-
-    var lodash = engines.getEngine('tmpl');
-    var fn = lodash.compile('<%= name %>');
-    fn(ctx, function(err, res) {
-      if (err) return cb(err);
-      assert(res === 'Jon Schlinkert');
+      assert(err);
+      assert.equal(err.message, 'name is not defined');
       cb();
     });
   });
 
-  it('should allow the returned function to be async and not require a context:', function(cb) {
-    var lodash = require('engine-lodash');
-    engines.setEngine('tmpl', lodash);
+  it('should directly return a compiled function:', function() {
+    var base = require('engine-base');
+    var ctx = {name: 'Jon Schlinkert'};
+    engines.setEngine('tmpl', base);
 
-    var lodash = engines.getEngine('tmpl');
-    var fn = lodash.compile('No context required');
+    var base = engines.getEngine('tmpl');
+    var fn = base.compile('<%= name %>');
+    fn = base.compile(fn);
+    fn = base.compile(fn);
+    fn = base.compile(fn);
+    assert.equal(fn(ctx), 'Jon Schlinkert');
+  });
+
+  it('should support async:', function(cb) {
+    var base = require('engine-base');
+    var ctx = {name: 'Jon Schlinkert'};
+    engines.setEngine('tmpl', base);
+
+    var base = engines.getEngine('tmpl');
+    var fn = base.compile('<%= name %>');
+    fn(ctx, function(err, res) {
+      if (err) return cb(err);
+      assert.equal(res, 'Jon Schlinkert');
+      cb();
+    });
+  });
+
+  it('should support async and not require a context:', function(cb) {
+    var base = require('engine-base');
+    engines.setEngine('tmpl', base);
+
+    var base = engines.getEngine('tmpl');
+    var fn = base.compile('No context required');
     fn(function(err, res) {
       if (err) return cb(err);
-      assert(res === 'No context required');
+      assert.equal(res, 'No context required');
       cb();
     });
   });
 
   it('should handle errors in sync render:', function(cb) {
-    var lodash = require('engine-lodash');
-    var ctx = {};
-    engines.setEngine('tmpl', lodash);
+    var base = require('engine-base');
+    engines.setEngine('tmpl', base);
 
-    var lodash = engines.getEngine('tmpl');
-    var fn = lodash.compile('<%= name %>');
+    var base = engines.getEngine('tmpl');
+    var fn = base.compile('<%= name %>');
     try {
-      var res = fn(ctx);
+      fn();
       cb(new Error('expected an error'));
     } catch (err) {
       assert.equal(err.message, 'name is not defined');
@@ -167,15 +161,14 @@ describe('engines compile', function() {
   });
 
   it('should handle errors in async callback:', function(cb) {
-    var lodash = require('engine-lodash');
-    var ctx = {};
-    engines.setEngine('tmpl', lodash);
+    var base = require('engine-base');
+    engines.setEngine('tmpl', base);
 
-    var lodash = engines.getEngine('tmpl');
-    var fn = lodash.compile('<%= name %>');
-    fn(ctx, function(err, res) {
-      if (!err) return cb(new Error('expected an error'));
-      assert(err.message === 'name is not defined');
+    var base = engines.getEngine('tmpl');
+    var fn = base.compile('<%= name %>');
+    fn(null, function(err, res) {
+      assert(err);
+      assert.equal(err.message, 'name is not defined');
       cb();
     });
   });

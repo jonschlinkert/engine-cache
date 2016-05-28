@@ -1,8 +1,7 @@
 'use strict';
 
-require('should');
 var assert = require('assert');
-var lodash = require('engine-lodash');
+var base = require('engine-base');
 var Engines = require('..');
 var engines;
 
@@ -18,42 +17,41 @@ describe('engines get', function() {
       engines.setEngine('c', {render: function() {} });
       engines.setEngine('d', {render: function() {} });
 
-      engines.getEngine('a').should.have.property('render');
-      engines.getEngine('b').should.have.property('render');
-      engines.getEngine('c').should.have.property('render');
-      engines.getEngine('d').should.have.property('render');
+      engines.getEngine('a').hasOwnProperty('render');
+      engines.getEngine('b').hasOwnProperty('render');
+      engines.getEngine('c').hasOwnProperty('render');
+      engines.getEngine('d').hasOwnProperty('render');
     });
 
     it('should return undefined when a falsey value is passed', function() {
-      assert(engines.getEngine() === undefined);
+      assert.equal(engines.getEngine(), undefined);
     });
 
     it('should use a default if defined:', function() {
-      var ctx = {name: 'Jon Schlinkert'};
       engines.options.defaultEngine = '*';
-      engines.setEngine('*', require('engine-lodash'));
+      engines.setEngine('*', require('engine-base'));
 
       var engine = engines.getEngine('tmpl');
-      assert(typeof engine.render === 'function');
+      assert.equal(typeof engine.render, 'function');
     });
 
     it('should use a default as a function if defined:', function() {
-      var ctx = {name: 'Jon Schlinkert'};
-      engines.options.defaultEngine = require('engine-lodash');
+      engines.options.defaultEngine = require('engine-base');
 
       var engine = engines.getEngine('tmpl');
-      assert(typeof engine.render === 'function');
+      assert.equal(typeof engine.render, 'function');
     });
 
-    it('should render content with a loaded engine: lodash.', function(done) {
-      var lodash = require('engine-lodash');
-      var ctx = {name: 'Jon Schlinkert'};
-      engines.setEngine('tmpl', lodash);
+    it('should render templates', function(cb) {
+      var base = require('engine-base');
+      engines.setEngine('tmpl', base);
 
-      var lodash = engines.getEngine('tmpl');
-      lodash.render('<%= name %>', ctx, function(err, content) {
-        content.should.equal('Jon Schlinkert');
-        done();
+      var engine = engines.getEngine('tmpl');
+
+      engine.render('<%= name %>', {name: 'Jon Schlinkert'}, function(err, content) {
+        if (err) return cb(err);
+        assert.equal(content, 'Jon Schlinkert');
+        cb();
       });
     });
   });

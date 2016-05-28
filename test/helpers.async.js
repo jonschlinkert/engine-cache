@@ -1,14 +1,7 @@
-/*!
- * engine-cache <https://github.com/jonschlinkert/engine-cache>
- *
- * Copyright (c) 2014-2015, Jon Schlinkert.
- * Licensed under the MIT License.
- */
-
 'use strict';
 
-require('should');
 require('handlebars');
+var assert = require('assert');
 var Engines = require('..');
 var engines = new Engines();
 var consolidate = require('consolidate');
@@ -18,40 +11,43 @@ describe('async helpers', function() {
     engines = new Engines();
   });
 
-  it('should render content with handlebars.', function(done) {
+  it('should render content with handlebars.', function(cb) {
     engines.setEngine('hbs', consolidate.handlebars);
     var helpers = engines.helpers('hbs');
-    helpers.addAsyncHelper('upper', function(str, options, callback) {
-      callback(null, str.toUpperCase());
+    var hbs = engines.getEngine('hbs');
+    
+    helpers.addAsyncHelper('upper', function(str, options, cb) {
+      cb(null, str.toUpperCase());
     });
 
-    var hbs = engines.getEngine('hbs');
-    hbs.render('{{upper name}}', {name: 'foo'}, function(err, content) {
-      if (err) console.log(err);
-      content.should.equal('FOO');
-      done();
+    hbs.render('{{upper name}}', {name: 'foo'}, function(err, res) {
+      if (err) return cb(err);
+      assert.equal(res, 'FOO');
+      cb();
     });
   });
 
-  it('should render content with multiple helpers in handlebars.', function(done) {
+  it('should render content with multiple helpers in handlebars.', function(cb) {
     engines.setEngine('hbs', consolidate.handlebars);
     var helpers = engines.helpers('hbs');
-    helpers.addAsyncHelper('upper', function(str, options, callback) {
-      callback(null, str.toUpperCase());
+    var hbs = engines.getEngine('hbs');
+
+    helpers.addAsyncHelper('upper', function(str, options, cb) {
+      cb(null, str.toUpperCase());
     });
 
-    var hbs = engines.getEngine('hbs');
     var ctx = {jon: 'foo', brian: 'doowb'};
 
-    hbs.render('Jon: {{upper jon}}\nBrian: {{upper brian}}', ctx, function(err, content) {
-      if (err) console.log(err);
-      content.should.equal('Jon: FOO\nBrian: DOOWB');
-      done();
+    hbs.render('Jon: {{upper jon}}\nBrian: {{upper brian}}', ctx, function(err, res) {
+      if (err) return cb(err);
+
+      assert.equal(res, 'Jon: FOO\nBrian: DOOWB');
+      cb();
     });
   });
 
-  it('should render content multiple times as async then sync.', function(done) {
-    engines.setEngine('tmpl', require('engine-lodash'));
+  it('should render content multiple times as async then sync.', function(cb) {
+    engines.setEngine('tmpl', require('engine-base'));
     var engine = engines.getEngine('tmpl');
     var ctx = {
       jon: 'foo',
@@ -63,14 +59,26 @@ describe('async helpers', function() {
       }
     };
 
-    engine.render('Jon: <%= upper(jon) %>\nBrian: <%= upper(brian) %>', ctx, function(err, content) {
-      if (err) console.log(err);
-      content.should.equal('Jon: FOO\nBrian: DOOWB');
+    var fn = engine.compile('Jon: <%= upper(jon) %>\nBrian: <%= upper(brian) %>', ctx);
+    var str = fn(ctx);
+    assert.equal(str, 'Jon: FOO\nBrian: DOOWB');
 
-      var fn = engine.compile('Jon: <%= upper(jon) %>\nBrian: <%= upper(brian) %>', ctx);
-      content = fn(ctx);
-      content.should.equal('Jon: FOO\nBrian: DOOWB');
-      done();
+    engine.render('Jon: <%= upper(jon) %>\nBrian: <%= upper(brian) %>', ctx, function(err, res) {
+      if (err) return cb(err);
+      assert.equal(res, 'Jon: FOO\nBrian: DOOWB');
+
+      var fn = engine.compile('Jon: <%= upper(jon) %>\nBrian: <%= upper(brian) %>');
+      var obj = {
+        jon: 'abc',
+        brian: 'xyz',
+        helpers: {
+          upper: function(str, options) {
+            return str.toUpperCase();
+          }
+        }
+      }
+      assert.equal(fn(obj), 'Jon: ABC\nBrian: XYZ');
+      cb();
     });
   });
 });

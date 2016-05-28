@@ -1,6 +1,5 @@
 'use strict';
 
-require('should');
 var assert = require('assert');
 var Engines = require('..');
 var engines = new Engines();
@@ -12,64 +11,67 @@ describe('engines render', function() {
   });
 
   describe('errors', function() {
-    it('should throw an error when no callback is passed', function() {
-      engines.setEngine('tmpl', require('engine-lodash'));
+    it('should throw an error when no callback is passed', function(cb) {
+      engines.setEngine('tmpl', require('engine-base'));
       var tmpl = engines.getEngine('tmpl');
-
-      (function() {
+      try {
         tmpl.render({});
-      }).should.throw('engine-cache "render" expected "callback" to be a function.');
+        cb(new Error('expected an error'));
+      } catch (err) {
+        assert.equal(err.message, 'expected a callback function');
+        cb();
+      }
     });
   });
 
   describe('.render()', function() {
-    it('should error when bad args are passed.', function(done) {
+    it('should error when bad args are passed.', function(cb) {
       engines.setEngine('hbs', consolidate.handlebars);
       var hbs = engines.getEngine('hbs');
 
       hbs.render(null, function(err, content) {
-        if (!err) return done(new Error('Expected an error'));
-        assert(err.message === 'engine-cache "render" expected "str" to be a string or compiled function.');
-        done();
+        assert(err);
+        assert.equal(err.message, 'expected a string or compiled function');
+        cb();
       });
     });
 
-    it('should render content with a cached engine: [handlebars].', function(done) {
+    it('should render content with a cached engine: [handlebars].', function(cb) {
       engines.setEngine('hbs', consolidate.handlebars);
       var hbs = engines.getEngine('hbs');
 
       hbs.render('{{name}}', {name: 'Jon Schlinkert'}, function(err, content) {
-        if (err) return done(err);
-        assert(content === 'Jon Schlinkert');
-        done();
+        if (err) return cb(err);
+        assert.equal(content, 'Jon Schlinkert');
+        cb();
       });
     });
 
-    it('should handle engine errors.', function(done) {
-      engines.setEngine('tmpl', require('engine-lodash'));
+    it('should handle engine errors.', function(cb) {
+      engines.setEngine('tmpl', require('engine-base'));
       var tmpl = engines.getEngine('tmpl');
 
       tmpl.render('<%= foo %>', function(err, content) {
-        if (!err) return done(new Error('Expected an error'));
-        assert(err.message === 'foo is not defined');
-        done();
+        assert(err);
+        assert.equal(err.message, 'foo is not defined');
+        cb();
       });
     });
 
-    it('should throw an error when a helper is undefiend', function(done) {
-      engines.setEngine('tmpl', require('engine-lodash'));
+    it('should throw an error when a helper is undefined', function(cb) {
+      engines.setEngine('tmpl', require('engine-base'));
       var tmpl = engines.getEngine('tmpl');
 
       tmpl.render('<%= upper(foo) %>', function(err, content) {
-        if (!err) return done(new Error('Expected an error'));
-        assert(err.message === 'upper is not defined');
-        done();
+        assert(err);
+        assert.equal(err.message, 'upper is not defined');
+        cb();
       });
     });
   });  
 
   it('should render content from a compiled function:', function(cb) {
-    var lodash = require('engine-lodash');
+    var lodash = require('engine-base');
     var ctx = {name: 'Jon Schlinkert'};
     engines.setEngine('tmpl', lodash);
 
@@ -78,13 +80,13 @@ describe('engines render', function() {
     
     lodash.render(fn, ctx, function(err, res) {
       if (err) return cb(err);
-      assert(res === 'Jon Schlinkert');
+      assert.equal(res, 'Jon Schlinkert');
       cb();
     });
   });
 
   it('should handle errors:', function(cb) {
-    var lodash = require('engine-lodash');
+    var lodash = require('engine-base');
     var ctx = {};
     engines.setEngine('tmpl', lodash);
 
@@ -92,8 +94,8 @@ describe('engines render', function() {
     var fn = lodash.compile('<%= name %>');
 
     lodash.render(fn, ctx, function(err, res) {
-      if (!err) return cb(new Error('expected an error'));
-      assert(err.message === 'name is not defined');
+      assert(err);
+      assert.equal(err.message, 'name is not defined');
       cb();
     });
   });

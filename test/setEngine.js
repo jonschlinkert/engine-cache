@@ -7,9 +7,8 @@
 
 'use strict';
 
-require('should');
 var assert = require('assert');
-var lodash = require('engine-lodash');
+var lodash = require('engine-base');
 var Engines = require('..');
 var engines;
 
@@ -19,20 +18,31 @@ describe('engines set', function() {
   });
 
   describe('errors', function() {
-    it('should throw an error when args are invalid', function() {
-      (function() {
+    it('should throw an error when args are invalid', function(cb) {
+      try {
         engines.setEngine({});
-      }).should.throw('engine-cache "setEngine" expected "engine" to be an object or function.');
+        cb(new Error('expected an error'));
+      } catch (err) {
+        assert.equal(err.message, 'expected an object or function');
+      }
 
-      (function() {
+      try {
         engines.setEngine(null);
-      }).should.throw('engine-cache "setEngine" expected "engine" to be an object or function.');
+        cb(new Error('expected an error'));
+      } catch (err) {
+        assert.equal(err.message, 'expected an object or function');
+      }
+      cb();
     });
 
-    it('should throw an error when engine is invalid', function() {
-      (function() {
+    it('should throw an error when engine is invalid', function(cb) {
+      try {
         engines.setEngine('tmpl', {});
-      }).should.throw('engine-cache "setEngine" expected "engine" to have a render or renderSync method.');
+        cb(new Error('expected an error'));
+      } catch (err) {
+        assert.equal(err.message, 'expected engine to have a render or renderSync method');
+        cb();
+      }
     });
   });
 
@@ -40,7 +50,7 @@ describe('engines set', function() {
     it('should cache the lodash engine.', function() {
       var ctx = {name: 'Jon Schlinkert'};
       engines.setEngine('tmpl', lodash);
-      engines.getEngine('tmpl').should.have.property('render');
+      assert(engines.getEngine('tmpl').hasOwnProperty('render'));
     });
 
     it('should set engines on the `engines` object.', function() {
@@ -49,7 +59,10 @@ describe('engines set', function() {
       engines.setEngine('c', {render: function() {} });
       engines.setEngine('d', {render: function() {} });
 
-      engines.cache.should.have.properties('.a', '.b', '.c', '.d');
+      assert(engines.cache.hasOwnProperty('.a'));
+      assert(engines.cache.hasOwnProperty('.b'));
+      assert(engines.cache.hasOwnProperty('.c'));
+      assert(engines.cache.hasOwnProperty('.d'));
     });
 
     it('should normalize engine extensions to have a dot.', function() {
@@ -58,7 +71,10 @@ describe('engines set', function() {
       engines.setEngine('c', {render: function() {} });
       engines.setEngine('.d', {render: function() {} });
 
-      engines.cache.should.have.properties('.a', '.b', '.c', '.d');
+      assert(engines.cache.hasOwnProperty('.a'));
+      assert(engines.cache.hasOwnProperty('.b'));
+      assert(engines.cache.hasOwnProperty('.c'));
+      assert(engines.cache.hasOwnProperty('.d'));
     });
 
     it('should be chainable.', function() {
@@ -68,17 +84,20 @@ describe('engines set', function() {
         .setEngine('c', {render: function() {} })
         .setEngine('d', {render: function() {} });
 
-      engines.cache.should.have.properties('.a', '.b', '.c', '.d');
+      assert(engines.cache.hasOwnProperty('.a'));
+      assert(engines.cache.hasOwnProperty('.b'));
+      assert(engines.cache.hasOwnProperty('.c'));
+      assert(engines.cache.hasOwnProperty('.d'));
     });
 
     it('should allow options to be passed as the last argument.', function() {
       engines.setEngine('a', {render: function() {}}, {foo: 'bar'})
-      engines.getEngine('.a').options.foo.should.be.a.string;
+      assert.equal(typeof engines.getEngine('.a').options.foo, 'string');
     });
 
     it('should allow options to be passed as the second argument.', function() {
       engines.setEngine('a', {foo: 'bar'}, {render: function() {}})
-      engines.getEngine('.a').options.foo.should.be.a.string;
+      assert.equal(typeof engines.getEngine('.a').options.foo, 'string');
     });
   });
 });
