@@ -46,10 +46,9 @@ Engines.prototype.setEngine = function(ext, fn, opts) {
     temp = null;
   }
 
-  var engine = {}, msg;
+  var engine = {};
   if (typeof fn !== 'object' && typeof fn !== 'function') {
-    msg = expected('setEngine', 'engine').toBe(['object', 'function']);
-    throw new TypeError(msg);
+    throw new TypeError('expected an object or function');
   }
 
   engine.render = fn.render || fn;
@@ -66,8 +65,7 @@ Engines.prototype.setEngine = function(ext, fn, opts) {
   engine.options = utils.merge({}, engine.options, fn.opts, opts);
 
   if (typeof engine.render !== 'function' && typeof engine.renderSync !== 'function') {
-    msg = expected('setEngine', 'engine').toHave(['render', 'renderSync method']);
-    throw new Error(msg);
+    throw new Error('expected engine to have a render or renderSync method');
   }
 
   // create helper caches for the engine
@@ -136,37 +134,6 @@ Engines.prototype.decorate = function(engine) {
   var compile = engine.compile;
 
   /**
-   * Merge the local engine helpers with the options helpers.
-   *
-   * @param  {Object} `options` Options passed into `render` or `compile`
-   * @return {Object} Options object with merged helpers
-   */
-
-  function mergeHelpers(engine, options) {
-    /*jshint validthis:true */
-    if (typeof options !== 'object') {
-      var msg = expected('mergeHelpers', 'options').toBe('object');
-      throw new TypeError(msg);
-    }
-
-    try {
-      var opts = utils.merge({}, options);
-      var helpers = utils.merge({}, engine.helpers, opts.helpers);
-      if (typeof helpers === 'object') {
-        for (var key in helpers) {
-          engine.asyncHelpers.set(key, helpers[key]);
-        }
-      }
-
-      opts.helpers = engine.asyncHelpers.get({wrap: opts.async});
-      return opts;
-    } catch (err) {
-      err.message = error('mergeHelpers', err.message);
-      throw new Error(err);
-    }
-  }
-
-  /**
    * Wrapped compile function for all engines loaded onto engine-cache.
    * If possible, compiles the string with the original engine's compile function.
    * Returns a render function that will either use the original engine's compiled function
@@ -190,9 +157,7 @@ Engines.prototype.decorate = function(engine) {
 
     if (!opts) opts = {};
     var helpers = mergeHelpers(engine, opts);
-    var compiled = compile
-      ? compile(str, helpers)
-      : null;
+    var compiled = compile ? compile(str, helpers) : null;
 
     return function(locals, cb) {
       if (typeof locals === 'function') {
@@ -246,38 +211,42 @@ Engines.prototype.decorate = function(engine) {
    * @param {Function} `cb` Callback function that returns `err, content`.
    */
 
-  engine.render = function wrappedRender(str, opts, cb) {
-    if (typeof opts === 'function') {
-      cb = opts;
-      opts = {};
+  engine.render = function wrappedRender(str, locals, cb) {
+    if (typeof locals === 'function') {
+      cb = locals;
+      locals = {};
     }
 
-    var fn, msg;
     if (typeof cb !== 'function') {
-      msg = expected('render', 'callback').toBe('function');
-      throw new TypeError(msg);
+      throw new TypeError('expected a callback function');
     }
 
     if (typeof str === 'function') {
-      fn = str;
-      fn(opts, cb);
+      str(locals, cb);
       return;
     }
 
-    if (typeof str === 'string') {
-      var tmp = opts.async;
-      opts.async = true;
-      fn = this.compile(str, opts);
-
-      return fn(opts, function(err, content) {
-        opts.async = tmp;
-        if (err) return cb(err);
-        cb(null, content);
-      });
+    if (typeof str !== 'string') {
+      cb(new TypeError('expected a string or compiled function'));
+      return;
     }
 
-    msg = expected('render', 'str').toBe(['string', 'compiled function']);
-    return cb(new TypeError(msg));
+    var async = locals.async;
+    locals.async = true;
+
+    // compile the template to create a function
+    var renderFn = this.compile(str, locals);
+
+    // call the function to render templates
+    renderFn(locals, function(err, content) {
+      if (err) {
+        cb(err);
+        return;
+      }
+      // reset original `async` value
+      locals.async = async;
+      cb(null, content);
+    });
   };
 
   /**
@@ -296,21 +265,42 @@ Engines.prototype.decorate = function(engine) {
 
   engine.renderSync = function wrappedRenderSync(str, options) {
     if (typeof str === 'function') {
-      var fn = str;
-      return fn(options);
+      return str(options);
     }
 
     if (typeof str !== 'string') {
-      var msg = expected('renderSync', 'str').toBe(['string', 'compiled function']);
-      throw new TypeError(msg);
+      throw new TypeError('expected a string or compiled function');
     }
 
-    var opts = utils.merge({}, options);
-    opts.helpers = utils.merge({}, this.helpers, opts.helpers);
-    str = this.compile(str, opts);
-    return str(opts);
+    var context = utils.extend({}, options);
+    context.helpers = utils.merge({}, this.helpers, context.helpers);
+    var render = this.compile(str, context);
+    return render(context);
   };
 };
+
+/**
+ * Merge the local engine helpers with the options helpers.
+ *
+ * @param  {Object} `options` Options passed into `render` or `compile`
+ * @return {Object} Options object with merged helpers
+ */
+
+function mergeHelpers(engine, options) {
+  if (typeof options !== 'object') {
+    throw new TypeError('expected an object');
+  }
+
+  var opts = utils.merge({}, options);
+  var helpers = utils.merge({}, engine.helpers, opts.helpers);
+  if (typeof helpers === 'object') {
+    for (var key in helpers) {
+      engine.asyncHelpers.set(key, helpers[key]);
+    }
+  }
+  opts.helpers = engine.asyncHelpers.get({wrap: opts.async});
+  return opts;
+}
 
 /**
  * Load an object of engines onto the `cache`.
@@ -328,9 +318,8 @@ Engines.prototype.decorate = function(engine) {
 
 Engines.prototype.load = function(engines) {
   for (var key in engines) {
-    var engine = engines[key];
-    if (key !== 'clearCache') {
-      this.setEngine(key, engine);
+    if (engines.hasOwnProperty(key) && key !== 'clearCache') {
+      this.setEngine(key, engines[key]);
     }
   }
   return this;
@@ -366,8 +355,8 @@ Engines.prototype.helpers = function(ext) {
 
 Engines.prototype.engineInspect = function(engine) {
   var inspect = ['"' + engine.name + '"'];
-  inspect.push('<ext "' + engine.options.ext + '">');
-
+  var exts = arrayify(engine.options.ext).join(', ');
+  inspect.push('<ext "' + exts + '">');
   engine.inspect = function() {
     return '<Engine ' + inspect.join(' ') + '>';
   };
@@ -377,46 +366,24 @@ Engines.prototype.engineInspect = function(engine) {
  * Utils
  */
 
-function isEngine(opts) {
-  return typeof opts === 'function'
-    || has(opts, 'render')
-    || has(opts, 'renderSync')
-    || has(opts, 'renderFile');
+function isString(val) {
+  return val && typeof val === 'string';
 }
 
-function error(method, msg) {
-  return 'engine-cache "' + method + '" ' + msg;
-}
-
-function expected(method, prop) {
-  var res = {};
-  function msg(type, prop, args) {
-    args = arrayify(args).map(function(arg, i) {
-      if (i === 0) return article(arg) + ' ' + arg;
-      return arg;
-    }).join(' or ');
-    return 'expected "' + prop + '" to ' + type + ' ' + args + '.';
-  }
-  res.toBe = function(args) {
-    return error(method, msg('be', prop, args));
-  };
-  res.toHave = function(args) {
-    return error(method, msg('have', prop, args));
-  };
-  return res;
-}
-
-function has(obj, key) {
-  return obj.hasOwnProperty(key);
+function isEngine(options) {
+  return typeof options === 'function'
+    || options.hasOwnProperty('render')
+    || options.hasOwnProperty('renderSync')
+    || options.hasOwnProperty('renderFile');
 }
 
 function arrayify(val) {
-  return Array.isArray(val) ? val : [val];
+  return val ? (Array.isArray(val) ? val : [val]) : [];
 }
 
 function formatExt(ext) {
-  if (!ext) return;
-  if (ext && ext.charAt(0) !== '.') {
+  if (!isString(ext)) return '';
+  if (ext.charAt(0) !== '.') {
     return '.' + ext;
   }
   return ext;
@@ -424,12 +391,7 @@ function formatExt(ext) {
 
 function stripExt(str) {
   if (str.charAt(0) === '.') {
-    return str.slice(1);
+    str = str.slice(1);
   }
   return str;
-}
-
-function article(word) {
-  var n = /^[aeiou]/.test(word);
-  return n ? 'an' : 'a';
 }
