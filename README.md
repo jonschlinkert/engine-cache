@@ -1,13 +1,13 @@
-# engine-cache [![NPM version](https://badge.fury.io/js/engine-cache.svg)](http://badge.fury.io/js/engine-cache)  [![Build Status](https://travis-ci.org/jonschlinkert/engine-cache.svg)](https://travis-ci.org/jonschlinkert/engine-cache)
+# engine-cache [![NPM version](https://img.shields.io/npm/v/engine-cache.svg?style=flat)](https://www.npmjs.com/package/engine-cache) [![NPM downloads](https://img.shields.io/npm/dm/engine-cache.svg?style=flat)](https://npmjs.org/package/engine-cache) [![Build Status](https://img.shields.io/travis/jonschlinkert/engine-cache.svg?style=flat)](https://travis-ci.org/jonschlinkert/engine-cache)
 
-> express.js inspired template-engine manager.
+express.js inspired template-engine manager.
 
 ## Install
 
-Install with [npm](https://www.npmjs.com/)
+Install with [npm](https://www.npmjs.com/):
 
 ```sh
-$ npm i engine-cache --save
+$ npm install engine-cache --save
 ```
 
 ## Usage
@@ -49,7 +49,7 @@ var consolidate = require('consolidate')
 engines.setEngine('hbs', consolidate.handlebars)
 ```
 
-### [.getEngine](index.js#L107)
+### [.getEngine](index.js#L105)
 
 Return the engine stored by `ext`. If no `ext` is passed, undefined is returned.
 
@@ -68,7 +68,7 @@ engine.getEngine('hbs');
 // => {render: [function], renderFile: [function]}
 ```
 
-### [.load](index.js#L316)
+### [.load](index.js#L319)
 
 Load an object of engines onto the `cache`. Mostly useful for testing, but exposed as a public method.
 
@@ -83,13 +83,13 @@ Load an object of engines onto the `cache`. Mostly useful for testing, but expos
 engines.load(require('consolidate'))
 ```
 
-### [.helpers](index.js#L346)
+### [.helpers](index.js#L348)
 
 Get and set helpers for the given `ext` (engine). If no `ext` is passed, the entire helper cache is returned.
 
 **Example:**
 
-See [helper-cache](https://github.com/jonschlinkert/helper-cache)for any related issues, API details, and documentation.
+See [helper-cache] for any related issues, API details, and documentation.
 
 **Params**
 
@@ -105,44 +105,56 @@ helpers.getEngineHelper('bar');
 helpers.getEngineHelper();
 ```
 
-## Related
-
-* [assemble](https://www.npmjs.com/package/assemble): Static site generator for Grunt.js, Yeoman and Node.js. Used by Zurb Foundation, Zurb Ink, H5BP/Effeckt,… [more](https://www.npmjs.com/package/assemble) | [homepage](http://assemble.io)
-* [async-helpers](https://www.npmjs.com/package/async-helpers): Use async helpers in templates with engines that typically only handle sync helpers. Handlebars and… [more](https://www.npmjs.com/package/async-helpers) | [homepage](https://github.com/doowb/async-helpers)
-* [engines](https://www.npmjs.com/package/engines): Template engine library with fast, synchronous rendering, based on consolidate. | [homepage](https://github.com/assemble/engines)
-* [helper-cache](https://www.npmjs.com/package/helper-cache): Easily register and get helper functions to be passed to any template engine or node.js… [more](https://www.npmjs.com/package/helper-cache) | [homepage](https://github.com/jonschlinkert/helper-cache)
-* [templates](https://www.npmjs.com/package/templates): System for creating and managing template collections, and rendering templates with any node.js template engine.… [more](https://www.npmjs.com/package/templates) | [homepage](https://github.com/jonschlinkert/templates)
-
-## Running tests
-
-Install dev dependencies:
-
-```sh
-$ npm i -d && npm test
-```
-
 ## Changelog
 
 **v0.16.0** the `.clear()` method was removed. A custom `inspect` method was added.
 
 **v0.15.0** `.getEngine()` no longer returns the entire `cache` object when `ext` is undefined.
 
+## Related projects
+
+You might also be interested in these projects:
+
+* [assemble](https://www.npmjs.com/package/assemble): Assemble is a powerful, extendable and easy to use static site generator for node.js. Used… [more](https://www.npmjs.com/package/assemble) | [homepage](https://github.com/assemble/assemble)
+* [async-helpers](https://www.npmjs.com/package/async-helpers): Use async helpers in templates with engines that typically only handle sync helpers. Handlebars and… [more](https://www.npmjs.com/package/async-helpers) | [homepage](https://github.com/doowb/async-helpers)
+* [engines](https://www.npmjs.com/package/engines): Template engine library with fast, synchronous rendering, based on consolidate. | [homepage](https://github.com/assemble/engines)
+* [helper-cache](https://www.npmjs.com/package/helper-cache): Easily register and get helper functions to be passed to any template engine or node.js… [more](https://www.npmjs.com/package/helper-cache) | [homepage](https://github.com/jonschlinkert/helper-cache)
+* [templates](https://www.npmjs.com/package/templates): System for creating and managing template collections, and rendering templates with any node.js template engine.… [more](https://www.npmjs.com/package/templates) | [homepage](https://github.com/jonschlinkert/templates)
+
 ## Contributing
 
+This document was generated by [verb](https://github.com/verbose/verb), please don't edit directly. Any changes to the readme must be made in [.verb.md](.verb.md). See [Building Docs](#building-docs).
+
 Pull requests and stars are always welcome. For bugs and feature requests, [please create an issue](https://github.com/jonschlinkert/engine-cache/issues/new).
+
+## Building docs
+
+Generate readme and API documentation with [verb](https://github.com/verbose/verb):
+
+```sh
+$ npm install -g verb verb-readme-generator && verb
+```
+
+## Running tests
+
+Install dev dependencies:
+
+```sh
+$ npm install -d && npm test
+```
 
 ## Author
 
 **Jon Schlinkert**
 
-+ [github/jonschlinkert](https://github.com/jonschlinkert)
-+ [twitter/jonschlinkert](http://twitter.com/jonschlinkert)
+* [github/jonschlinkert](https://github.com/jonschlinkert)
+* [twitter/jonschlinkert](http://twitter.com/jonschlinkert)
 
 ## License
 
-Copyright © 2014-2015 Jon Schlinkert
-Released under the MIT license.
+Copyright © 2016, [Jon Schlinkert](https://github.com/jonschlinkert).
+Released under the [MIT license](https://github.com/jonschlinkert/engine-cache/blob/master/LICENSE).
 
 ***
 
-_This file was generated by [verb-cli](https://github.com/assemble/verb-cli) on September 30, 2015._
+_This file was generated by [verb](https://github.com/verbose/verb), v0.9.0, on May 30, 2016._
