@@ -39,7 +39,7 @@ function Engines(engines, options) {
  */
 
 Engines.prototype.setEngine = function(ext, fn, opts) {
-  if (opts && isEngine(opts)) {
+  if (opts && utils.isEngine(opts)) {
     var temp = fn;
     fn = opts;
     opts = temp;
@@ -75,8 +75,8 @@ Engines.prototype.setEngine = function(ext, fn, opts) {
   engine.helpers = new Helpers(opts);
   engine.asyncHelpers = new AsyncHelpers(opts);
 
-  engine.name = engine.name || engine.options.name || stripExt(ext);
-  engine.options.ext = formatExt(ext);
+  engine.name = engine.name || engine.options.name || utils.stripExt(ext);
+  engine.options.ext = utils.formatExt(ext);
 
   // decorate wrapped methods for async helper handling
   this.decorate(engine);
@@ -104,10 +104,10 @@ Engines.prototype.setEngine = function(ext, fn, opts) {
 
 Engines.prototype.getEngine = function(ext) {
   if (!ext) return;
-  var engine = this.cache[formatExt(ext)];
+  var engine = this.cache[utils.formatExt(ext)];
   if (typeof engine === 'undefined' && this.options.defaultEngine) {
     if (typeof this.options.defaultEngine === 'string') {
-      return this.cache[formatExt(this.options.defaultEngine)];
+      return this.cache[utils.formatExt(this.options.defaultEngine)];
     } else {
       return this.options.defaultEngine;
     }
@@ -355,43 +355,9 @@ Engines.prototype.helpers = function(ext) {
 
 Engines.prototype.engineInspect = function(engine) {
   var inspect = ['"' + engine.name + '"'];
-  var exts = arrayify(engine.options.ext).join(', ');
+  var exts = utils.arrayify(engine.options.ext).join(', ');
   inspect.push('<ext "' + exts + '">');
   engine.inspect = function() {
     return '<Engine ' + inspect.join(' ') + '>';
   };
 };
-
-/**
- * Utils
- */
-
-function isString(val) {
-  return val && typeof val === 'string';
-}
-
-function isEngine(options) {
-  return typeof options === 'function'
-    || options.hasOwnProperty('render')
-    || options.hasOwnProperty('renderSync')
-    || options.hasOwnProperty('renderFile');
-}
-
-function arrayify(val) {
-  return val ? (Array.isArray(val) ? val : [val]) : [];
-}
-
-function formatExt(ext) {
-  if (!isString(ext)) return '';
-  if (ext.charAt(0) !== '.') {
-    return '.' + ext;
-  }
-  return ext;
-}
-
-function stripExt(str) {
-  if (str.charAt(0) === '.') {
-    str = str.slice(1);
-  }
-  return str;
-}
