@@ -35,10 +35,11 @@
   },
   "devDependencies": {
     "consolidate": "^0.14.1",
+    "engine-base": "^0.1.2",
     "engine-handlebars": "^0.8.0",
-    "engine-lodash": "^0.8.2",
     "engines": "^0.4.0",
     "gulp": "^3.9.1",
+    "gulp-format-md": "^0.1.9",
     "gulp-istanbul": "^0.10.4",
     "gulp-jshint": "^1.11.2",
     "gulp-mocha": "^2.2.0",
@@ -46,7 +47,6 @@
     "jshint-stylish": "^2.2.0",
     "lodash": "^4.12.0",
     "mocha": "^2.4.5",
-    "should": "^8.3.1",
     "swig": "^1.4.2",
     "underscore": "^1.8.3"
   },
@@ -93,6 +93,20 @@
         "helper-cache",
         "templates"
       ]
-    }
+    },
+    "toc": false,
+    "layout": "default",
+    "tasks": [
+      "readme"
+    ],
+    "plugins": [
+      "gulp-format-md"
+    ],
+    "lint": {
+      "reflinks": true
+    },
+    "reflinks": [
+      "verb"
+    ]
   }
 }
