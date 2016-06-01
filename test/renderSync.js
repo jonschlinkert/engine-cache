@@ -18,7 +18,7 @@ var engines, ctx;
 describe('.renderSync()', function() {
   before(function() {
     engines = new Engines();
-    engines.load(require('engines'));
+    engines.setEngines(require('engines'));
     ctx = {letter: 'b'};
   });
 

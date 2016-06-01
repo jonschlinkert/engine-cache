@@ -40,7 +40,7 @@ describe('engines set', function() {
         engines.setEngine('tmpl', {});
         cb(new Error('expected an error'));
       } catch (err) {
-        assert.equal(err.message, 'expected engine to have a render or renderSync method');
+        assert.equal(err.message, 'expected engine to have a render method');
         cb();
       }
     });

@@ -3,10 +3,14 @@
 var utils = require('lazy-cache')(require);
 var fn = require;
 require = utils;
+
+/**
+ * Utils
+ */
+
 require('extend-shallow', 'extend');
+require('isobject', 'isObject');
 require('mixin-deep', 'merge');
-require('async-helpers', 'AsyncHelpers');
-require('helper-cache', 'Helpers');
 require = fn;
 
 utils.isString = function(val) {
@@ -33,11 +37,12 @@ utils.stripExt = function(str) {
   return str;
 };
 
-utils.isEngine = function(options) {
-  return typeof options === 'function'
-    || options.hasOwnProperty('render')
-    || options.hasOwnProperty('renderSync')
-    || options.hasOwnProperty('renderFile');
+utils.isEngine = function(val) {
+  if (typeof val === 'function') return true;
+  if (!utils.isObject(val)) return false;
+  return val.hasOwnProperty('render')
+    || val.hasOwnProperty('renderSync')
+    || val.hasOwnProperty('renderFile');
 };
 
 /**
