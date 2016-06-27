@@ -222,20 +222,15 @@ function decorate(engine) {
       }
 
       if (typeof compiled === 'function') {
-        try {
-          str = compiled(locals);
-        } catch (err) {
-          if (typeof cb === 'function') {
-            cb(err);
-            return;
-          }
-          throw err;
-        }
+        str = compiled;
+
+        // these have already been passed into the
+        // engine during compile time
+        delete helpers.helpers;
+        delete helpers.partials;
       }
 
-      helpers = mergeHelpers(engine, settings);
       var data = {};
-
       if (settings && typeof settings.mergeFn === 'function') {
         data = settings.mergeFn(helpers, locals);
       } else {
