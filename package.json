@@ -107,7 +107,8 @@
       "reflinks": true
     },
     "reflinks": [
-      "verb"
+      "verb",
+      "verb-readme-generator"
     ]
   }
 }
