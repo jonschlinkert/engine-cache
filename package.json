@@ -17,6 +17,8 @@
   "license": "MIT",
   "files": [
     "index.js",
+    "LICENSE",
+    "README.md",
     "utils.js"
   ],
   "main": "index.js",
@@ -27,7 +29,7 @@
     "test": "mocha"
   },
   "dependencies": {
-    "async-helpers": "^0.3.8",
+    "async-helpers": "^0.3.9",
     "extend-shallow": "^2.0.1",
     "helper-cache": "^0.7.2",
     "isobject": "^2.1.0",
@@ -107,6 +109,7 @@
       "reflinks": true
     },
     "reflinks": [
+      "helper-cache",
       "verb",
       "verb-readme-generator"
     ]
