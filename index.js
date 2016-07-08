@@ -234,7 +234,7 @@ function decorate(engine) {
       if (settings && typeof settings.mergeFn === 'function') {
         data = settings.mergeFn(helpers, locals);
       } else {
-        data = utils.merge({}, locals, helpers);
+        data = utils.extend({}, locals, helpers);
       }
 
       if (typeof cb !== 'function') {
