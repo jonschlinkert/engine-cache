@@ -202,7 +202,7 @@ function decorate(engine) {
    * ```
    *
    * @param  {String} `str` Original string to compile.
-   * @param  {Object} `opts` Options/options to pass to engine's compile function.
+   * @param  {Object} `opts` Options/options to pass to engine's compile function. If a function is passed on `options.mergeFn`, that will be used for merging context before passing it to render.
    * @return {Function} Returns render function to call that takes `locals` and optional `callback` function.
    */
 
@@ -231,15 +231,15 @@ function decorate(engine) {
       if (typeof compiled === 'function') {
         str = compiled;
         helpers = {};
-        // delete helpers.helpers;
-        // delete helpers.partials;
       }
 
       var data = {};
       if (typeof locals === 'string' || Array.isArray(locals)) {
         data = locals;
+
       } else if (options && typeof options.mergeFn === 'function') {
         data = options.mergeFn(helpers, locals);
+
       } else {
         data = utils.merge({}, locals, helpers);
       }
