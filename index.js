@@ -21,8 +21,8 @@ module.exports = Engines;
 function Engines(engines, options) {
   this.options = options || {};
   this.cache = engines || {};
-  this.AsyncHelpers = this.options.AsyncHelpers || require('async-helpers');
-  this.Helpers = this.options.Helpers || require('helper-cache');
+  this.AsyncHelpers = this.options.AsyncHelpers || utils.AsyncHelpers;
+  this.Helpers = this.options.Helpers || utils.Helpers;
 }
 
 /**
@@ -40,20 +40,22 @@ function Engines(engines, options) {
  * @api public
  */
 
-Engines.prototype.setEngine = function(ext, fn, opts) {
-  var engine = normalizeEngine(fn, opts);
+Engines.prototype.setEngine = function(ext, fn, options) {
+  var engine = normalizeEngine(fn, options);
+  var opts = engine.options;
 
-  engine.helpers = new this.Helpers(engine.options);
-  engine.asyncHelpers = new this.AsyncHelpers(engine.options);
-  engine.name = utils.stripExt(engine.name || engine.options.name || ext);
-  engine.options.ext = utils.formatExt(ext);
+  engine.helpers = new this.Helpers(opts);
+  engine.asyncHelpers = new this.AsyncHelpers(opts);
+  engine.name = utils.stripExt(engine.name || opts.name || ext);
+  opts.ext = utils.formatExt(ext);
 
   // decorate wrapped methods for async helper handling
   decorate(engine);
   // add custom inspect method
   inspect(engine);
+
   // set the engine on the cache
-  this.cache[engine.options.ext] = engine;
+  this.cache[opts.ext] = engine;
   return this;
 };
 
@@ -97,13 +99,12 @@ Engines.prototype.setEngines = function(engines) {
  */
 
 Engines.prototype.getEngine = function(ext) {
-  if (!ext) return;
-  var engine = this.cache[utils.formatExt(ext)];
-  if (typeof engine === 'undefined' && this.options.defaultEngine) {
-    if (typeof this.options.defaultEngine === 'string') {
-      return this.cache[utils.formatExt(this.options.defaultEngine)];
+  var engine = ext ? this.cache[utils.formatExt(ext)] : null;
+  if (!engine) {
+    engine = this.options.defaultEngine;
+    if (typeof engine === 'string') {
+      engine = this.cache[utils.formatExt(engine)];
     }
-    return this.options.defaultEngine;
   }
   return engine;
 };
@@ -129,7 +130,10 @@ Engines.prototype.getEngine = function(ext) {
  */
 
 Engines.prototype.helpers = function(ext) {
-  return this.getEngine(ext).helpers;
+  var engine = this.getEngine(ext);
+  if (engine) {
+    return engine.helpers;
+  }
 };
 
 /**
@@ -138,7 +142,7 @@ Engines.prototype.helpers = function(ext) {
 
 function normalizeEngine(fn, options) {
   if (utils.isEngine(options)) {
-    return normalizeEngine(options, fn);
+    return normalizeEngine(options, fn); //<= reverse args
   }
 
   if (!utils.isObject(fn) && typeof fn !== 'function') {
@@ -155,7 +159,7 @@ function normalizeEngine(fn, options) {
 
   for (var key in fn) {
     if (key === 'options') {
-      engine.options = utils.extend({}, engine.options, fn[key]);
+      engine.options = utils.merge({}, engine.options, fn[key]);
       continue;
     }
     if (key === '__express') {
@@ -198,21 +202,21 @@ function decorate(engine) {
    * ```
    *
    * @param  {String} `str` Original string to compile.
-   * @param  {Object} `opts` Options/settings to pass to engine's compile function.
+   * @param  {Object} `opts` Options/options to pass to engine's compile function.
    * @return {Function} Returns render function to call that takes `locals` and optional `callback` function.
    */
 
-  engine.compile = function engineCompile(str, settings) {
+  engine.compile = function engineCompile(str, options) {
     if (typeof str === 'function') {
       return str;
     }
 
-    if (typeof settings !== 'undefined' && !utils.isObject(settings)) {
-      throw new TypeError('expected settings to be an object or undefined');
+    if (typeof options !== 'undefined' && !utils.isObject(options)) {
+      throw new TypeError('expected options to be an object or undefined');
     }
 
-    settings = utils.extend({}, settings);
-    var helpers = mergeHelpers(engine, settings);
+    options = utils.extend({}, options);
+    var helpers = mergeHelpers(engine, options);
     var compiled = compile ? compile(str, helpers) : null;
 
     return function(locals, cb) {
@@ -221,20 +225,23 @@ function decorate(engine) {
         locals = {};
       }
 
+      // if compiled already, we can delete helpers and partials from
+      // the `helpers` object, since were bound to the context and
+      // passed to the engine at compile time
       if (typeof compiled === 'function') {
         str = compiled;
-
-        // these have already been passed into the
-        // engine during compile time
-        delete helpers.helpers;
-        delete helpers.partials;
+        helpers = {};
+        // delete helpers.helpers;
+        // delete helpers.partials;
       }
 
       var data = {};
-      if (settings && typeof settings.mergeFn === 'function') {
-        data = settings.mergeFn(helpers, locals);
+      if (typeof locals === 'string' || Array.isArray(locals)) {
+        data = locals;
+      } else if (options && typeof options.mergeFn === 'function') {
+        data = options.mergeFn(helpers, locals);
       } else {
-        data = utils.extend({}, locals, helpers);
+        data = utils.merge({}, locals, helpers);
       }
 
       if (typeof cb !== 'function') {
@@ -355,19 +362,19 @@ function inspect(engine) {
  */
 
 function mergeHelpers(engine, options) {
-  if (typeof options !== 'object') {
+  if (!options || typeof options !== 'object') {
     throw new TypeError('expected an object');
   }
 
-  var opts = utils.merge({}, options);
+  var opts = utils.extend({}, options);
   var helpers = utils.merge({}, engine.helpers, opts.helpers);
-  if (typeof helpers === 'object') {
-    for (var key in helpers) {
-      if (helpers.hasOwnProperty(key)) {
-        engine.asyncHelpers.set(key, helpers[key]);
-      }
+
+  for (var key in helpers) {
+    if (helpers.hasOwnProperty(key)) {
+      engine.asyncHelpers.set(key, helpers[key]);
     }
   }
+
   opts.helpers = engine.asyncHelpers.get({wrap: opts.async});
   return opts;
 }

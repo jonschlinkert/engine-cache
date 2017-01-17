@@ -8,7 +8,9 @@ require = utils;
  * Utils
  */
 
+require('async-helpers', 'AsyncHelpers');
 require('extend-shallow', 'extend');
+require('helper-cache', 'Helpers')
 require('isobject', 'isObject');
 require('mixin-deep', 'merge');
 require = fn;

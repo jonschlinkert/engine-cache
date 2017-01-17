@@ -81,7 +81,7 @@ describe('engines compile', function() {
       base.compile('<%= name %>', 'cause an error');
       cb(new Error('expected an error'));
     } catch (err) {
-      assert.equal(err.message, 'expected settings to be an object or undefined');
+      assert.equal(err.message, 'expected options to be an object or undefined');
       cb();
     }
   });
