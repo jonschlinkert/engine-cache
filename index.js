@@ -217,7 +217,7 @@ function decorate(engine) {
 
     options = utils.extend({}, options);
     var helpers = mergeHelpers(engine, options);
-    var compiled = compile ? compile(str, helpers) : null;
+    var compiled = compile ? compile.call(engine, str, helpers) : null;
 
     return function(locals, cb) {
       if (typeof locals === 'function') {
@@ -245,10 +245,10 @@ function decorate(engine) {
       }
 
       if (typeof cb !== 'function') {
-        return renderSync(str, data);
+        return renderSync.call(engine, str, data);
       }
 
-      render(str, data, function(err, str) {
+      render.call(engine, str, data, function(err, str) {
         if (err) {
           cb(err);
           return;
