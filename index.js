@@ -162,7 +162,7 @@ function normalizeEngine(fn, options) {
       engine.options = utils.merge({}, engine.options, fn[key]);
       continue;
     }
-    if (key === '__express') {
+    if (key === '__express' && !fn.hasOwnProperty('renderFile')) {
       engine.renderFile = fn[key];
     }
     engine[key] = fn[key];
