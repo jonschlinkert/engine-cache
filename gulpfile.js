@@ -7,7 +7,7 @@ var eslint = require('gulp-eslint');
 var unused = require('gulp-unused');
 
 gulp.task('coverage', function() {
-  return gulp.src(['index.js', 'lib/**/*.js'])
+  return gulp.src(['index.js', 'utils.js'])
     .pipe(istanbul())
     .pipe(istanbul.hookRequire());
 });
@@ -19,14 +19,14 @@ gulp.task('test', ['coverage'], function() {
 });
 
 gulp.task('lint', function() {
-  return gulp.src(['*.js', 'lib/**/*.js', 'test/*.js'])
+  return gulp.src(['*.js', 'test/*.js'])
     .pipe(eslint())
     .pipe(eslint.format());
 });
 
 gulp.task('unused', function() {
-  return gulp.src(['index.js', 'lib/**/*.js'])
-    .pipe(unused({keys: Object.keys(require('./lib/utils.js'))}))
+  return gulp.src('*.js')
+    .pipe(unused({keys: Object.keys(require('./utils.js'))}))
 });
 
 gulp.task('default', ['test', 'lint']);
