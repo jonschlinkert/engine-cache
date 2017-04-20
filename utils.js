@@ -1,19 +1,11 @@
 'use strict';
 
-var utils = require('lazy-cache')(require);
-var fn = require;
-require = utils;
+var isObject = require('isobject');
+var utils = module.exports;
 
 /**
  * Utils
  */
-
-require('async-helpers', 'AsyncHelpers');
-require('extend-shallow', 'extend');
-require('helper-cache', 'Helpers')
-require('isobject', 'isObject');
-require('mixin-deep', 'merge');
-require = fn;
 
 utils.isString = function(val) {
   return val && typeof val === 'string';
@@ -41,7 +33,7 @@ utils.stripExt = function(str) {
 
 utils.isEngine = function(val) {
   if (typeof val === 'function') return true;
-  if (!utils.isObject(val)) return false;
+  if (!isObject(val)) return false;
   return val.hasOwnProperty('render')
     || val.hasOwnProperty('renderSync')
     || val.hasOwnProperty('renderFile');

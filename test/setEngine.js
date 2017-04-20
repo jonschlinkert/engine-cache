@@ -91,12 +91,12 @@ describe('engines set', function() {
     });
 
     it('should allow options to be passed as the last argument.', function() {
-      engines.setEngine('a', {render: function() {}}, {foo: 'bar'})
+      engines.setEngine('a', {render: function() {}}, {foo: 'bar'});
       assert.equal(typeof engines.getEngine('.a').options.foo, 'string');
     });
 
     it('should allow options to be passed as the second argument.', function() {
-      engines.setEngine('a', {foo: 'bar'}, {render: function() {}})
+      engines.setEngine('a', {foo: 'bar'}, {render: function() {}});
       assert.equal(typeof engines.getEngine('.a').options.foo, 'string');
     });
   });

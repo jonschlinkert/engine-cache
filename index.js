@@ -1,6 +1,11 @@
 'use strict';
 
 var utils = require('./utils');
+var Helpers = require('helper-cache');
+var AsyncHelpers = require('async-helpers');
+var extend = require('extend-shallow');
+var isObject = require('isobject');
+var merge = require('mixin-deep');
 
 /**
  * Expose `Engines`
@@ -21,8 +26,8 @@ module.exports = Engines;
 function Engines(engines, options) {
   this.options = options || {};
   this.cache = engines || {};
-  this.AsyncHelpers = this.options.AsyncHelpers || utils.AsyncHelpers;
-  this.Helpers = this.options.Helpers || utils.Helpers;
+  this.AsyncHelpers = this.options.AsyncHelpers || AsyncHelpers;
+  this.Helpers = this.options.Helpers || Helpers;
 }
 
 /**
@@ -51,8 +56,11 @@ Engines.prototype.setEngine = function(ext, fn, options) {
 
   // decorate wrapped methods for async helper handling
   decorate(engine);
+
   // add custom inspect method
-  inspect(engine);
+  if (this.options.customInspect !== false) {
+    inspect(engine);
+  }
 
   // set the engine on the cache
   this.cache[opts.ext] = engine;
@@ -145,21 +153,25 @@ function normalizeEngine(fn, options) {
     return normalizeEngine(options, fn); //<= reverse args
   }
 
-  if (!utils.isObject(fn) && typeof fn !== 'function') {
+  if (!isObject(fn) && typeof fn !== 'function') {
     throw new TypeError('expected an object or function');
   }
 
   var engine = {};
   engine.render = fn.render || fn;
-  engine.options = utils.extend({}, options);
+  engine.options = extend({}, options);
 
   if (typeof engine.render !== 'function') {
     throw new Error('expected engine to have a render method');
   }
 
-  for (var key in fn) {
+  var keys = Object.keys(fn);
+  var len = keys.length;
+  var idx = -1;
+  while (++idx < len) {
+    var key = keys[idx];
     if (key === 'options') {
-      engine.options = utils.merge({}, engine.options, fn[key]);
+      engine.options = extend({}, engine.options, fn[key]);
       continue;
     }
     if (key === '__express' && !fn.hasOwnProperty('renderFile')) {
@@ -211,11 +223,11 @@ function decorate(engine) {
       return str;
     }
 
-    if (typeof options !== 'undefined' && !utils.isObject(options)) {
+    if (typeof options !== 'undefined' && !isObject(options)) {
       throw new TypeError('expected options to be an object or undefined');
     }
 
-    options = utils.extend({}, options);
+    options = extend({}, options);
     var helpers = mergeHelpers(engine, options);
     var compiled = compile ? compile.call(engine, str, helpers) : null;
 
@@ -241,7 +253,7 @@ function decorate(engine) {
         data = options.mergeFn(helpers, locals);
 
       } else {
-        data = utils.merge({}, locals, helpers);
+        data = merge({}, locals, helpers);
       }
 
       if (typeof cb !== 'function') {
@@ -284,7 +296,8 @@ function decorate(engine) {
     }
 
     if (typeof str === 'function') {
-      str(locals, cb);
+      var fn = str;
+      fn(locals, cb);
       return;
     }
 
@@ -297,10 +310,10 @@ function decorate(engine) {
     locals.async = true;
 
     // compile the template to create a function
-    var fn = this.compile(str, locals);
+    var render = this.compile(str, locals);
 
     // call the function to render templates
-    fn(locals, function(err, content) {
+    render(locals, function(err, content) {
       if (err) {
         cb(err);
         return;
@@ -334,10 +347,9 @@ function decorate(engine) {
       throw new TypeError('expected a string or compiled function');
     }
 
-    var context = utils.extend({}, locals);
-    context.helpers = utils.merge({}, this.helpers, context.helpers);
-    var render = this.compile(str, context);
-    return render(context);
+    var context = extend({}, locals);
+    context.helpers = merge({}, this.helpers, context.helpers);
+    return this.compile(str, context)(context);
   };
 }
 
@@ -366,13 +378,12 @@ function mergeHelpers(engine, options) {
     throw new TypeError('expected an object');
   }
 
-  var opts = utils.extend({}, options);
-  var helpers = utils.merge({}, engine.helpers, opts.helpers);
-
-  for (var key in helpers) {
-    if (helpers.hasOwnProperty(key)) {
-      engine.asyncHelpers.set(key, helpers[key]);
-    }
+  var opts = extend({}, options);
+  var helpers = merge({}, engine.helpers.cache, opts.helpers);
+  var keys = Object.keys(helpers);
+  for (var i = 0; i < keys.length; i++) {
+    var key = keys[i];
+    engine.asyncHelpers.set(key, helpers[key]);
   }
 
   opts.helpers = engine.asyncHelpers.get({wrap: opts.async});

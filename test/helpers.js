@@ -29,18 +29,17 @@ describe('engines helpers', function() {
 
     it('should set helpers on the given engine.', function() {
       var engine = engines.getEngine('abc');
-      engine.helpers.addHelper('a', function a() {})
-      engine.helpers.addHelper('b', function b() {})
-      engine.helpers.addHelper('c', function c() {})
-
-      assert.equal(Object.keys(engine.helpers).length, 3);
+      engine.helpers.addHelper('a', function a() {});
+      engine.helpers.addHelper('b', function b() {});
+      engine.helpers.addHelper('c', function c() {});
+      assert.equal(Object.keys(engine.helpers.cache).length, 3);
     });
 
     it('should get helpers from the given engine.', function() {
       var engine = engines.getEngine('abc');
-      engine.helpers.addHelper('a', function a() {})
-      engine.helpers.addHelper('b', function b() {})
-      engine.helpers.addHelper('c', function c() {})
+      engine.helpers.addHelper('a', function a() {});
+      engine.helpers.addHelper('b', function b() {});
+      engine.helpers.addHelper('c', function c() {});
       var helper = engine.helpers.getHelper('a');
       assert.equal(typeof helper, 'function');
       assert.equal(helper.name, 'a');
@@ -55,7 +54,7 @@ describe('engines helpers', function() {
       });
 
       var fn = engine.compile('<%= upper(name) %>');
-      fn({name: 'foo'})
+      fn({name: 'foo'});
       assert.equal(fn({name: 'foo'}), 'FOO');
     });
   });

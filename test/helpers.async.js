@@ -15,8 +15,8 @@ describe('async helpers', function() {
     engines.setEngine('hbs', consolidate.handlebars);
     var helpers = engines.helpers('hbs');
     var hbs = engines.getEngine('hbs');
-    
-    helpers.addAsyncHelper('upper', function(str, options, cb) {
+
+    helpers.asyncHelper('upper', function(str, options, cb) {
       cb(null, str.toUpperCase());
     });
 
@@ -32,7 +32,7 @@ describe('async helpers', function() {
     var helpers = engines.helpers('hbs');
     var hbs = engines.getEngine('hbs');
 
-    helpers.addAsyncHelper('upper', function(str, options, cb) {
+    helpers.asyncHelper('upper', function(str, options, cb) {
       cb(null, str.toUpperCase());
     });
 
@@ -76,7 +76,7 @@ describe('async helpers', function() {
             return str.toUpperCase();
           }
         }
-      }
+      };
       assert.equal(fn(obj), 'Jon: ABC\nBrian: XYZ');
       cb();
     });
